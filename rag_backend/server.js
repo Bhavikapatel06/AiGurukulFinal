@@ -255,11 +255,12 @@ Generate exactly ${numQuestions} questions. Make them thoughtful and educational
   );
   
   const response = await Promise.race([
-    cohere.chat({
-      model: "command-r-plus-08-2024",
-      message: prompt,
-      preamble: "You are an expert quiz generator. You output ONLY valid JSON. No markdown, no code fences."
-    }),
+      cohere.chat({
+        model: "command-r-08-2024",
+        message: prompt,
+        max_tokens: 4000,
+        preamble: `You are an expert quiz generator. You MUST output exactly ${numQuestions} questions. Do not stop early. You output ONLY valid JSON. No markdown, no code fences.`
+      }),
     timeout
   ]);
 
@@ -429,9 +430,10 @@ Generate exactly ${numQuestions} questions about "${topic}". Return ONLY the JSO
     const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 60000));
     const response = await Promise.race([
       cohere.chat({
-        model: "command-r-plus-08-2024",
+        model: "command-r-08-2024",
         message: prompt,
-        preamble: "You are an expert quiz generator. You output ONLY valid JSON. No markdown, no code fences."
+        max_tokens: 4000,
+        preamble: `You are an expert quiz generator. You MUST output exactly ${numQuestions} questions. Do not stop early. You output ONLY valid JSON. No markdown, no code fences.`
       }),
       timeout
     ]);
