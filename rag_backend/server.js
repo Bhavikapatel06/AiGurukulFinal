@@ -265,9 +265,13 @@ Generate exactly ${numQuestions} questions. Make them thoughtful and educational
   ]);
 
   let raw = response.text.trim();
-  // Strip markdown code fences if present
-  raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
-  return JSON.parse(raw);
+  const startIdx = raw.indexOf('{');
+  const endIdx = raw.lastIndexOf('}');
+  if (startIdx !== -1 && endIdx !== -1) {
+    raw = raw.substring(startIdx, endIdx + 1);
+  }
+  const quiz = JSON.parse(raw);
+  return quiz;
 }
 
 // ── POST /quiz/upload — Upload file → extract text → generate quiz directly ──
@@ -349,18 +353,23 @@ Return ONLY valid JSON in this exact format, no extra text:
 
 Generate exactly ${numQuestions} questions. Return ONLY the JSON object.`;
 
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 60000));
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 90000));
     const response = await Promise.race([
       cohere.chat({
-        model: "command-r-plus-08-2024",
+        model: "command-r-08-2024",
         message: prompt,
-        preamble: "You are an expert quiz generator. You output ONLY valid JSON. No markdown, no code fences."
+        max_tokens: 4000,
+        preamble: `You are an expert quiz generator. You MUST output exactly ${numQuestions} questions. Do not stop early. You output ONLY valid JSON. No markdown, no code fences.`
       }),
       timeout
     ]);
 
     let raw = response.text.trim();
-    raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
+    const startIdx = raw.indexOf('{');
+    const endIdx = raw.lastIndexOf('}');
+    if (startIdx !== -1 && endIdx !== -1) {
+      raw = raw.substring(startIdx, endIdx + 1);
+    }
     const quiz = JSON.parse(raw);
 
     res.json({ success: true, quiz: quiz.questions, source: req.file.originalname });
@@ -427,7 +436,7 @@ Return ONLY valid JSON in this exact format, no extra text:
 
 Generate exactly ${numQuestions} questions about "${topic}". Return ONLY the JSON object.`;
 
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 60000));
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 90000));
     const response = await Promise.race([
       cohere.chat({
         model: "command-r-08-2024",
@@ -439,7 +448,11 @@ Generate exactly ${numQuestions} questions about "${topic}". Return ONLY the JSO
     ]);
 
     let raw = response.text.trim();
-    raw = raw.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
+    const startIdx = raw.indexOf('{');
+    const endIdx = raw.lastIndexOf('}');
+    if (startIdx !== -1 && endIdx !== -1) {
+      raw = raw.substring(startIdx, endIdx + 1);
+    }
     const quiz = JSON.parse(raw);
 
     res.json({ success: true, quiz: quiz.questions, source: topic });
