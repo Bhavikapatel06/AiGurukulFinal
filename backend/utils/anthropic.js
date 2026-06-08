@@ -73,7 +73,12 @@ async function callOpenRouter(systemPrompt, messages, maxTokens) {
  */
 async function callClaudeJSON(systemPrompt, userMessage, maxTokens = 1200) {
   const raw = await callClaude(systemPrompt, userMessage, maxTokens);
-  const cleaned = raw.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+  let cleaned = raw.trim();
+  const startIdx = cleaned.indexOf('{');
+  const endIdx = cleaned.lastIndexOf('}');
+  if (startIdx !== -1 && endIdx !== -1) {
+    cleaned = cleaned.substring(startIdx, endIdx + 1);
+  }
   try {
     return JSON.parse(cleaned);
   } catch (err) {
