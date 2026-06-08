@@ -16,6 +16,7 @@ const multer = require('multer');
 const pdfParse = require('pdf-parse');
 const fs = require('fs');
 const path = require('path');
+const mammoth = require('mammoth');
 
 const app = express();
 app.use(cors({
@@ -184,10 +185,10 @@ const upload = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
-    const allowed = ['.pdf', '.txt', '.md', '.doc', '.docx'];
+    const allowed = ['.txt', '.doc', '.docx'];
     const ext = path.extname(file.originalname).toLowerCase();
     if (allowed.includes(ext)) cb(null, true);
-    else cb(new Error('Unsupported file type. Use PDF, TXT, MD, or DOC.'));
+    else cb(new Error('Unsupported file type. Use TXT or DOCX.'));
   }
 });
 
@@ -205,13 +206,22 @@ function chunkText(text, chunkSize = 500, overlap = 50) {
 // Helper: extract text from uploaded file
 async function extractText(filePath) {
   const ext = path.extname(filePath).toLowerCase();
-  if (ext === '.pdf') {
-    const dataBuffer = fs.readFileSync(filePath);
-    const data = await pdfParse(dataBuffer);
-    return data.text;
+  
+  try {
+    if (ext === '.pdf') {
+      const dataBuffer = fs.readFileSync(filePath);
+      const data = await pdfParse(dataBuffer);
+      return data.text;
+    } else if (ext === '.docx') {
+      const result = await mammoth.extractRawText({ path: filePath });
+      return result.value;
+    }
+    // For txt, md, doc — just read as text
+    return fs.readFileSync(filePath, 'utf-8');
+  } catch (err) {
+    console.error(`Error extracting text from ${ext} file:`, err);
+    throw err;
   }
-  // For txt, md, doc — just read as text
-  return fs.readFileSync(filePath, 'utf-8');
 }
 
 // Helper: generate quiz from context using LLM
@@ -278,7 +288,7 @@ app.post('/quiz/upload', upload.single('file'), async (req, res) => {
       text = await extractText(filePath);
     } catch (extractErr) {
       console.error('Text extraction error:', extractErr);
-      return res.status(400).json({ success: false, error: 'Failed to read the file. Make sure it is a valid PDF or text file.' });
+      return res.status(400).json({ success: false, error: `Failed to read the file (${extractErr.message || 'Unknown error'}). Make sure it is a valid PDF, DOCX, or text file.` });
     }
 
     if (!text || text.trim().length < 50) {
@@ -317,6 +327,7 @@ RULES:
 - Each question must have exactly 4 options (A, B, C, D) with only one correct answer.
 - Make questions educational and varied in difficulty.
 - Questions should test comprehension of the material.
+- If the document content is primarily in Sanskrit, generate the quiz questions, options, and explanations entirely in the Sanskrit language. Otherwise, use English.
 
 Return ONLY valid JSON in this exact format, no extra text:
 {
@@ -394,6 +405,7 @@ CRITICAL RULES:
 - Each question must have exactly 4 options (A, B, C, D) with only one correct answer.
 - Make questions educational, factual, and varied in difficulty.
 - Use your own knowledge about "${topic}" to create accurate questions.
+- If the topic "${topic}" is written in Sanskrit, you MUST generate the quiz questions, options, and explanations entirely in the Sanskrit language. Otherwise, use English.
 
 Return ONLY valid JSON in this exact format, no extra text:
 {

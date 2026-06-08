@@ -85,8 +85,8 @@ function renderInputScreen(container) {
         <div class="qg-mode-card ${s.mode === 'upload' ? 'selected' : ''}" id="qg-mode-upload">
           <div class="qg-mode-icon">📄</div>
           <div class="qg-mode-title">Upload File</div>
-          <div class="qg-mode-desc">Upload a PDF or text file and get a quiz generated from its content</div>
-          <div class="qg-mode-badge">PDF, TXT, MD — up to 10MB</div>
+          <div class="qg-mode-desc">Upload a TXT or DOCX file and get a quiz generated from its content</div>
+          <div class="qg-mode-badge">TXT, DOCX — up to 10MB</div>
         </div>
 
         <!-- Topic Card -->
@@ -101,10 +101,10 @@ function renderInputScreen(container) {
       <!-- Upload Form -->
       <div id="qg-upload-form" class="qg-form-panel" style="display: ${s.mode === 'upload' ? 'flex' : 'none'};">
         <div class="qg-upload-zone" id="qg-drop-zone">
-          <input type="file" id="qg-file-input" accept=".pdf,.txt,.md,.doc,.docx" style="display:none;" />
+          <input type="file" id="qg-file-input" accept=".txt,.doc,.docx" style="display:none;" />
           <div class="qg-upload-icon">${s.fileName ? '✅' : '📁'}</div>
           <div class="qg-upload-text">${s.fileName ? s.fileName : 'Click to browse or drag & drop your file'}</div>
-          <div class="qg-upload-hint">${s.fileName ? 'Click to change file' : 'Supports PDF, TXT, MD — up to 10MB'}</div>
+          <div class="qg-upload-hint">${s.fileName ? 'Click to change file' : 'Supports TXT, DOCX — up to 10MB'}</div>
         </div>
 
         <div class="qg-num-row">
