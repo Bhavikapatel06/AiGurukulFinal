@@ -94,7 +94,7 @@ ${context || 'No matching context found.'}
 User Query: ${query}`;
 
   const timeout = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Timeout")), 20000)
+    setTimeout(() => reject(new Error("Timeout")), 60000)
   );
 
   // Use Cohere's highly capable command-r-plus model for generation
@@ -241,7 +241,7 @@ IMPORTANT: Return ONLY valid JSON in this exact format, no extra text:
 Generate exactly ${numQuestions} questions. Make them thoughtful and educational. Vary difficulty. Return ONLY the JSON object.`;
 
   const timeout = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error("Timeout")), 20000)
+    setTimeout(() => reject(new Error("Timeout")), 60000)
   );
   
   const response = await Promise.race([
@@ -337,7 +337,7 @@ Return ONLY valid JSON in this exact format, no extra text:
 
 Generate exactly ${numQuestions} questions. Return ONLY the JSON object.`;
 
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 20000));
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 60000));
     const response = await Promise.race([
       cohere.chat({
         model: "command-r-plus-08-2024",
@@ -414,7 +414,7 @@ Return ONLY valid JSON in this exact format, no extra text:
 
 Generate exactly ${numQuestions} questions about "${topic}". Return ONLY the JSON object.`;
 
-    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 20000));
+    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 60000));
     const response = await Promise.race([
       cohere.chat({
         model: "command-r-plus-08-2024",

@@ -113,6 +113,10 @@ function renderUserSelect(container) {
 function renderLevelSelect(container) {
   const user = state.game.selectedUser;
   const userData = GAME_USERS.find(u => u.id === user);
+  if (!userData) {
+    actions.goTo('game-main');
+    return;
+  }
   const unlocked = state.game.unlockedLevels[user] || 1;
   const completed = state.game.completedLevels;
 
@@ -427,6 +431,10 @@ function checkCompletion(container) {
 function renderStore(container) {
   const user = state.game.selectedUser;
   const userData = GAME_USERS.find(u => u.id === user);
+  if (!userData) {
+    actions.goTo('game-main');
+    return;
+  }
   const items = SHOP_ITEMS.filter(i => i.forUser.includes(user));
   const ownedItemRefs = state.game.inventory.filter(i => i.purchasedFor === user);
   
