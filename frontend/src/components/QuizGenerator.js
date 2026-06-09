@@ -73,7 +73,7 @@ function renderInputScreen(container) {
       <button class="btn btn-ghost" id="qg-back-btn">← Back</button>
       <span class="screen-header-title">📝 Quiz Generator</span>
     </div>
-    <div class="qg-body">
+    <div class="qg-body" data-mode="${s.mode || ''}">
       <div class="qg-hero">
         <div class="qg-hero-icon">🧩</div>
         <h2 class="qg-hero-title">Generate Your Quiz</h2>
@@ -146,8 +146,13 @@ function renderInputScreen(container) {
 
   // ── Event wiring ──
   container.querySelector('#qg-back-btn').addEventListener('click', () => {
-    resetQuiz();
-    actions.goTo('landing');
+    if (quizState.mode) {
+      quizState.mode = null;
+      renderInner(container);
+    } else {
+      resetQuiz();
+      actions.goTo('landing');
+    }
   });
 
   container.querySelector('#qg-mode-upload').addEventListener('click', () => {

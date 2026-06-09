@@ -1769,8 +1769,20 @@
       margin-bottom: 24px;
     }
 
-    @media(max-width: 600px) {
+    @media(max-width: 768px) {
       .qg-mode-grid { grid-template-columns: 1fr; }
+      
+      .qg-body[data-mode="upload"] #qg-mode-topic {
+        display: none;
+      }
+      .qg-body[data-mode="topic"] #qg-mode-upload {
+        display: none;
+      }
+      
+      .qg-body[data-mode="upload"] .qg-hero,
+      .qg-body[data-mode="topic"] .qg-hero {
+        display: none;
+      }
     }
 
     .qg-mode-card {
