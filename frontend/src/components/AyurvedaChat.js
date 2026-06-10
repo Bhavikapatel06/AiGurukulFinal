@@ -481,6 +481,7 @@ function injectStyles() {
       outline: none;
       transition: all 0.25s;
       resize: none;
+      caret-color: #facc15;
     }
     .ayc-input:focus {
       border-color: rgba(212,175,55,0.5);
@@ -704,8 +705,22 @@ function renderLeftContent() {
         <div style="font-size: 36px; margin-bottom: 14px;">🌿</div>
         <div style="font-family: 'Cinzel', serif; color: var(--gold); font-size: 15px; margin-bottom: 10px;">Ayurvedic Healing Protocol</div>
         <p style="color: rgba(212,175,55,0.55); font-size: 13px; line-height: 1.65; max-width: 290px; margin: 0 auto 20px;">
-          Ask a question related to Ayurveda, health, wellness, remedies, sleep, digestion, immunity, stress, or lifestyle.
+          Share your health concern in the chat and a personalized step-by-step Ayurvedic protocol will appear here automatically.
         </p>
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 290px;">
+          <div style="background: rgba(212,175,55,0.04); border: 1px solid rgba(212,175,55,0.1); border-radius: 8px; padding: 12px 14px; text-align: left;">
+            <div style="font-family: 'Cinzel', serif; font-size: 10px; color: rgba(212,175,55,0.5); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px;">Dosha Analysis</div>
+            <div style="font-size: 12px; color: rgba(200,191,168,0.4); font-style: italic;">Will update after your first message...</div>
+          </div>
+          <div style="background: rgba(212,175,55,0.04); border: 1px solid rgba(212,175,55,0.1); border-radius: 8px; padding: 12px 14px; text-align: left;">
+            <div style="font-family: 'Cinzel', serif; font-size: 10px; color: rgba(212,175,55,0.5); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px;">Remedy Strategy</div>
+            <div style="font-size: 12px; color: rgba(200,191,168,0.4); font-style: italic;">Personalized protocol loading...</div>
+          </div>
+          <div style="background: rgba(212,175,55,0.04); border: 1px solid rgba(212,175,55,0.1); border-radius: 8px; padding: 12px 14px; text-align: left;">
+            <div style="font-family: 'Cinzel', serif; font-size: 10px; color: rgba(212,175,55,0.5); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 5px;">Healing Protocol</div>
+            <div style="font-size: 12px; color: rgba(200,191,168,0.4); font-style: italic;">Steps will appear here...</div>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -837,8 +852,133 @@ async function handleSend() {
   await sendMessage(msg);
 }
 
-/* ─── Core: send message → AI first, fallback second ────────────────────── */
+async function fetchCustomFlow(msg) {
+  isFlowLoading = true;
+  updateLeftContent();
+  
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/chat/flow`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg })
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    if (data && data.title && Array.isArray(data.steps) && data.steps.length > 0) {
+      currentFlowData = data;
+    } else {
+      currentFlowData = buildLocalFlow(msg);
+    }
+  } catch (err) {
+    console.warn("Flow API unavailable, using local protocol:", err.message);
+    currentFlowData = buildLocalFlow(msg);
+  } finally {
+    isFlowLoading = false;
+    updateLeftContent();
+  }
+}
+
+/** Build a keyword-smart local flow when the API is unavailable */
+function buildLocalFlow(msg) {
+  const q = msg.toLowerCase();
+  
+  // Keyword detection for common health topics
+  const is = (keys) => keys.some(k => q.includes(k));
+
+  if (is(['acid', 'reflux', 'acidity', 'heartburn', 'stomach', 'digestion', 'digestive', 'gastric'])) {
+    return {
+      title: "Pitta Pacification Protocol — Digestive Health",
+      doshaAnalysis: "Excess Pitta dosha is the primary cause of acid reflux and digestive fire imbalance. Aggravated Pitta creates excess heat and acid in the digestive tract, leading to burning sensations and discomfort.",
+      steps: [
+        { step: 1, title: "Phase 1: Cooling & Soothing (Week 1)", desc: "Drink cooled fennel seed tea (saunf) 3x daily. Avoid spicy, sour, and fried foods. Eat meals at fixed times. Start with Amla (Indian gooseberry) powder — 1 tsp in water before meals." },
+        { step: 2, title: "Phase 2: Core Remedies (Weeks 2-4)", desc: "Take Avipattikar Churna (1 tsp before meals) to neutralize excess acid. Licorice root (Mulethi) tea soothes the stomach lining. Shatavari (500mg) twice daily helps heal gastric mucosa." },
+        { step: 3, title: "Phase 3: Long-term Balance", desc: "Practice Sheetali pranayama (cooling breath) daily. Sleep on left side. Avoid eating 3 hours before bed. Include ghee, coconut, and cooling foods like cucumber and coriander in your diet." }
+      ],
+      warning: "Avoid Triphala if you have active ulcers. Consult a physician if symptoms persist beyond 2 weeks or if there is blood in stool."
+    };
+  }
+
+  if (is(['sleep', 'insomnia', 'rest', 'wakeful', 'sleepless', 'night'])) {
+    return {
+      title: "Vata Calming Protocol — Sleep Restoration",
+      doshaAnalysis: "Disturbed sleep is a classic sign of aggravated Vata dosha, which governs the nervous system. Excess Vata creates mental restlessness, light sleep, and early waking.",
+      steps: [
+        { step: 1, title: "Phase 1: Grounding Routine (Week 1)", desc: "Warm sesame oil self-massage (Abhyanga) on feet and scalp before bed. Drink warm milk with 1/4 tsp nutmeg and 1 tsp ghee at 9pm. Set a strict sleep schedule — lights out by 10pm." },
+        { step: 2, title: "Phase 2: Herbal Support (Weeks 2-4)", desc: "Ashwagandha (600mg at night) is the premier nervine tonic for sleep. Brahmi (Bacopa) 300mg supports the mind. Jatamansi powder (1/4 tsp in warm milk) calms deep anxiety and induces sleep." },
+        { step: 3, title: "Phase 3: Mind-Body Integration", desc: "Practice Yoga Nidra or Nadi Shodhana pranayama before sleep. Minimize screens after 8pm. Keep the bedroom cool and dark. A walk after dinner supports digestion and reduces evening Vata." }
+      ],
+      warning: "Ashwagandha may interact with thyroid medications. Nutmeg is safe in small amounts only — do not exceed 1/4 tsp. Consult a doctor if sleep problems last more than 2 weeks."
+    };
+  }
+
+  if (is(['stress', 'anxiety', 'worry', 'nervous', 'tension', 'mental', 'mind', 'calm'])) {
+    return {
+      title: "Vata-Pitta Balance Protocol — Stress & Anxiety",
+      doshaAnalysis: "Stress and anxiety reflect a combined Vata-Pitta imbalance. Vata creates fear and racing thoughts; Pitta adds irritability and intensity. Grounding and cooling practices are essential.",
+      steps: [
+        { step: 1, title: "Phase 1: Immediate Relief (Week 1)", desc: "Brahmi tea (boil 1 tsp brahmi leaves in water) 2x daily. Cold rose water on the forehead. Daily 10-minute Anulom Vilom pranayama (alternate nostril breathing) to calm the nervous system immediately." },
+        { step: 2, title: "Phase 2: Adaptogen Protocol (Weeks 2-6)", desc: "Ashwagandha (500mg morning) is the king adaptogen for stress. Shankhapushpi syrup (2 tsp daily) improves mental calm. Tagar (Valerian) 250mg at night reduces anxiety and promotes rest." },
+        { step: 3, title: "Phase 3: Lifestyle Reset", desc: "Daily Abhyanga (oil massage) with warm sesame oil calms the nervous system. Minimize caffeine and news intake. Practice gratitude journaling each morning. Swimming or walking in nature is highly therapeutic." }
+      ],
+      warning: "Do not stop prescribed medications without doctor guidance. If you experience panic attacks, consult a mental health professional alongside Ayurvedic care."
+    };
+  }
+
+  if (is(['cough', 'cold', 'sore throat', 'throat', 'respiratory', 'breathing', 'lung', 'mucus', 'phlegm'])) {
+    return {
+      title: "Kapha Cleansing Protocol — Respiratory Health",
+      doshaAnalysis: "Respiratory issues are typically Kapha-dominant conditions. Excess Kapha causes mucus buildup, congestion, and sluggish lung function. Warming and expectorant herbs are the primary treatment.",
+      steps: [
+        { step: 1, title: "Phase 1: Steam & Warm Therapy (Days 1-7)", desc: "Steam inhalation with eucalyptus or tulsi leaves 2x daily. Ginger-tulsi-black pepper tea (Kadha) 3x daily. Apply warm sesame oil on the chest at night. Avoid cold foods, dairy, and bananas." },
+        { step: 2, title: "Phase 2: Herbal Expectorants (Weeks 2-3)", desc: "Sitopaladi Churna (1/2 tsp with honey) 3x daily is the classic Kapha respiratory formula. Vasaka (Malabar Nut) syrup clears bronchial passages. Trikatu (ginger, pepper, pippali) in warm water breaks mucus." },
+        { step: 3, title: "Phase 3: Lung Strengthening", desc: "Pranayama: Kapalabhati (skull-shining breath) 5 minutes daily strengthens lung capacity. Triphala taken nightly supports immunity. Avoid exposure to cold winds and ensure adequate vitamin D." }
+      ],
+      warning: "Seek immediate medical attention if you have high fever, difficulty breathing, or blood in mucus. These remedies are for mild respiratory concerns only."
+    };
+  }
+
+  if (is(['weight', 'fat', 'obese', 'obesity', 'slim', 'thin', 'metabolism'])) {
+    return {
+      title: "Kapha Reduction Protocol — Metabolism & Weight",
+      doshaAnalysis: "Weight imbalance typically reflects Kapha dominance with sluggish Agni (digestive fire). Slow metabolism, water retention, and low energy are classic Kapha signs requiring stimulation and detox.",
+      steps: [
+        { step: 1, title: "Phase 1: Agni Activation (Week 1-2)", desc: "Drink warm water with ginger and lemon first thing each morning. Take Trikatu powder (1/4 tsp) before meals to ignite digestive fire. Follow a light, warm, cooked diet. Avoid heavy grains, dairy, and fried foods." },
+        { step: 2, title: "Phase 2: Metabolic Herbs (Weeks 2-6)", desc: "Guggul (500mg twice daily) is the premier Ayurvedic fat-metabolism herb. Triphala (1 tsp at night) cleanses the colon and reduces Ama. Garcinia (Vrikshamla) before meals reduces appetite naturally." },
+        { step: 3, title: "Phase 3: Active Lifestyle Integration", desc: "Vigorous exercise (brisk walk, sun salutations) for 30 minutes each morning. Dry brushing (Garshana) with raw silk gloves stimulates lymph flow. Intermittent fasting (16:8) works excellently with Kapha constitution." }
+      ],
+      warning: "Do not use Guggul if pregnant or nursing. Consult a physician before starting any herbal supplement if you have thyroid conditions."
+    };
+  }
+
+  if (is(['skin', 'acne', 'pimple', 'eczema', 'rash', 'itching', 'psoriasis', 'glow', 'complexion'])) {
+    return {
+      title: "Pitta-Kapha Balancing Protocol — Skin Health",
+      doshaAnalysis: "Skin issues primarily reflect excess Pitta (causing inflammation, redness, and heat) combined with Kapha (causing oiliness and toxin buildup). Blood purification is essential.",
+      steps: [
+        { step: 1, title: "Phase 1: Blood Purification (Week 1-2)", desc: "Neem leaf tea (2 cups daily) is the most potent blood purifier in Ayurveda. Apply neem and turmeric paste topically on affected areas. Eliminate dairy, sugar, and spicy foods completely for 2 weeks." },
+        { step: 2, title: "Phase 2: Core Skin Herbs (Weeks 2-6)", desc: "Manjistha (500mg twice daily) is the premier Rasa-Rakta shodhan (blood cleanser). Sariva (Hemidesmus indicus) cools the blood. Khadirarishta (20ml after meals) purifies deeply. Aloe vera gel internally (30ml morning)." },
+        { step: 3, title: "Phase 3: Topical Care & Diet", desc: "Rose water and sandalwood paste as a face mask 3x/week. Drink 3-4 liters of water daily. Include pomegranate, coconut water, and amla in your diet. Avoid alcohol and reduce sun exposure between 10am-4pm." }
+      ],
+      warning: "If skin condition is severe, infected, or covers large areas, consult a dermatologist. Internal herbal use during pregnancy requires physician guidance."
+    };
+  }
+
+  // Generic comprehensive fallback for any other query
+  const topic = msg.length > 60 ? msg.substring(0, 57) + '...' : msg;
+  return {
+    title: `Ayurvedic Wellness Protocol`,
+    doshaAnalysis: `Based on your concern — "${topic}" — a thorough assessment of all three doshas (Vata, Pitta, Kapha) is recommended. The Guru will analyze your specific symptoms in the chat to determine which dosha is most imbalanced and prescribe the appropriate herbal protocol.`,
+    steps: [
+      { step: 1, title: "Phase 1: Ama (Toxin) Cleanse", desc: "Begin with warm water, ginger, and lemon each morning to kindle Agni (digestive fire). Triphala churna (1 tsp in warm water before bed) gently cleanses the digestive tract and eliminates Ama. Follow a light, warm, freshly cooked diet for 7-14 days." },
+      { step: 2, title: "Phase 2: Dosha-Specific Herbs", desc: "Ashwagandha (Vata/stress), Guduchi (Pitta/immunity), and Trikatu (Kapha/digestion) are foundational Ayurvedic herbs. Once the Guru identifies your primary imbalance from the chat, a more targeted formulation will be recommended." },
+      { step: 3, title: "Phase 3: Dinacharya (Daily Routine)", desc: "Rise at 6am, self-massage with warm sesame oil (Abhyanga), practice 10 minutes of Anulom Vilom pranayama, eat meals at regular fixed times, and sleep by 10pm. This daily rhythm is the most powerful Ayurvedic medicine." }
+    ],
+    warning: "All recommendations are for general wellness only. For serious, chronic, or worsening conditions, always consult a qualified Ayurvedic practitioner or medical doctor."
+  };
+}
+
 async function sendMessage(msg) {
+  // Guard: never send or display empty messages
   if (!msg || !msg.trim()) return;
   const cleanMsg = msg.trim();
 
@@ -846,14 +986,8 @@ async function sendMessage(msg) {
   refreshMessages();
   scrollChat();
 
-  // Kick off left-panel flow generation in parallel
-  if (isGreetingOrUnrelated(cleanMsg)) {
-    currentFlowData = null;
-    updateLeftContent();
-    updateLayoutState();
-  } else {
-    fetchCustomFlow(cleanMsg);
-  }
+  // Asynchronously trigger custom flow generation on the left panel
+  fetchCustomFlow(cleanMsg);
 
   // Left-panel flow generation runs in parallel via fetchCustomFlow(cleanMsg)
 
@@ -874,10 +1008,10 @@ async function sendMessage(msg) {
     </span>
   `;
   if (!document.getElementById('ayc-dot-bounce-style')) {
-    const st = document.createElement('style');
-    st.id = 'ayc-dot-bounce-style';
-    st.textContent = `@keyframes ayc-dot-bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }`;
-    document.head.appendChild(st);
+    const style = document.createElement('style');
+    style.id = 'ayc-dot-bounce-style';
+    style.textContent = `@keyframes ayc-dot-bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }`;
+    document.head.appendChild(style);
   }
   messagesDiv?.appendChild(thinking);
   scrollChat();
@@ -891,26 +1025,32 @@ async function sendMessage(msg) {
     const res = await fetch(`${BACKEND_URL}/api/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        persona: 'guru',
-        message: cleanMsg,
-        history: state.chatHistory.slice(0, -1).slice(-10),
-        isAyurveda: true
+      body: JSON.stringify({ 
+        persona: 'guru', 
+        message: cleanMsg, 
+        history: state.chatHistory.slice(-10) 
       }),
     });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.success && data.reply && data.reply.trim()) {
-        reply = data.reply.trim();
-      }
-    }
-  } catch (err) {
-    console.warn('Backend chat API failed:', err.message);
-  }
 
-  // 2️⃣ Last resort: standard fallback message
-  if (!reply) {
-    reply = "Sorry, I am unable to connect to the wisdom server. Please check your connection and try again.";
+    document.getElementById(thinkingId)?.remove();
+
+    if (!res.ok) {
+      throw new Error(`Server responded with ${res.status}`);
+    }
+
+    const data = await res.json();
+    const reply = data.success && data.reply && data.reply.trim()
+      ? data.reply.trim()
+      : buildLocalChatReply(cleanMsg);
+
+    state.chatHistory.push({ role: 'assistant', content: reply });
+  } catch (err) {
+    console.error("Chat API error:", err);
+    document.getElementById(thinkingId)?.remove();
+    state.chatHistory.push({
+      role: 'assistant',
+      content: buildLocalChatReply(cleanMsg)
+    });
   }
 
   document.getElementById(thinkingId)?.remove();
@@ -921,247 +1061,127 @@ async function sendMessage(msg) {
   scrollChat();
 }
 
-/* ─── Flow panel: AI-generated via backend ─────────────── */
-async function fetchCustomFlow(msg) {
-  isFlowLoading = true;
-  updateLeftContent();
-  updateLayoutState();
-
-  try {
-    const res = await fetch(`${BACKEND_URL}/api/chat/flow`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: msg })
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = await res.json();
-    if (data && data.success !== false && data.title && Array.isArray(data.steps) && data.steps.length > 0) {
-      currentFlowData = data;
-    } else {
-      currentFlowData = null;
-    }
-  } catch (err) {
-    console.warn('Flow API failed:', err.message);
-    currentFlowData = null;
-  } finally {
-    isFlowLoading = false;
-    updateLeftContent();
-    updateLayoutState();
-  }
-}
-
-function isGreetingOrUnrelated(msg) {
-  if (!msg) return true;
-  const m = msg.trim().toLowerCase();
-  const greetings = ['hello', 'hi', 'hey', 'good morning', 'good afternoon', 'good evening', 'namaste', 'yo', 'sup', 'test'];
-  if (greetings.includes(m)) return true;
-  return false;
-}
-
-
-
-
-
-/* ─── Keyword-only local chat fallback (used only when ALL APIs fail) ────── */
+/** Generate a local Ayurvedic reply based on keywords when API is unavailable */
 function buildLocalChatReply(msg) {
-  const cond = detectCondition(msg);
+  const q = msg.toLowerCase();
+  const is = (keys) => keys.some(k => q.includes(k));
 
-  const replies = {
-    serious: `**Possible Cause:**\nA complex condition requiring medical treatment.
-
-**Try:**
-• Eat simple, fresh home-cooked meals.
-• Rest fully to help your body recover.
-• Drink small sips of warm water.
-
-**Avoid:**
-• Straining yourself physically or mentally.
-• Delaying professional medical visits.
-
-**Safety Note:**
-This is supportive only. Continue your prescribed medical treatments.`,
-
-    hair_fall: `**Possible Cause:**\nScalp dryness and nutrient deficiencies.
+  if (is(['acid', 'reflux', 'acidity', 'heartburn', 'gastric', 'stomach', 'digestion'])) {
+    return `**Possible Cause:** Excess Pitta (heat) and increased acidity in the stomach.
 
 **Try:**
-• Rub fresh aloe vera gel onto your scalp to cool it.
-• Drink a small glass of gooseberry (Amla) juice daily.
-• Gently massage your scalp with fingertips to boost blood flow.
+* Take Amla powder (1 tsp) in cool water before meals.
+* Drink warm fennel seed tea after meals.
+* Eat cooling foods like cucumber and coconut water.
 
 **Avoid:**
-• Washing hair with hot water.
-• Using heavy chemical styling gels.
+* Spicy, sour, and fried foods.
+* Caffeine, alcohol, and hot spices.
 
-**Safety Note:**
-If hair fall is sudden or severe, consult a dermatologist.`,
+**Safety Note:** If you experience severe burning or persistent chest pain, consult a doctor.`;
+  }
 
-    fever: `**Possible Cause:**\nYour body temperature rising to clear out an infection.
+  if (is(['sleep', 'insomnia', 'sleepless', 'wakeful', 'tired', 'fatigue'])) {
+    return `**Possible Cause:** Aggravated Vata causing nervous system restlessness.
 
 **Try:**
-• Rest in a quiet, well-ventilated room.
-• Sip warm coriander seed infusion.
-• Keep clothing light to help release heat.
+* Massage warm sesame oil onto your feet and scalp before bed.
+* Drink warm milk with a pinch of nutmeg.
+* Switch off screens 1 hour before sleep.
 
 **Avoid:**
-• Taking cold showers or cold baths.
-• Eating solid, heavy, or cold foods.
+* Cold beverages in the evening.
+* Strenuous exercise late at night.
 
-**Safety Note:**
-See a doctor if the fever lasts more than 3 days.`,
+**Safety Note:** If insomnia is chronic or accompanied by severe anxiety, consult a doctor.`;
+  }
 
-    cold_cough: `**Possible Cause:**\nCongestion and throat irritation from seasonal changes.
+  if (is(['stress', 'anxiety', 'worry', 'nervous', 'tension', 'panic', 'calm'])) {
+    return `**Possible Cause:** Vata-Pitta disturbance in the mind.
 
 **Try:**
-• Keep your neck and chest warm with a soft scarf.
-• Sip warm water with a pinch of turmeric.
-• Drink hot water steeped with fresh basil leaves.
+* Practice 5 minutes of Anulom Vilom pranayama.
+* Take Ashwagandha with warm water.
+* Drink Brahmi tea twice daily.
 
 **Avoid:**
-• Cold drinks, ice cream, and heavy dairy.
-• Exposure to cold winds or drafty rooms.
+* Excessive caffeine and stimulants.
+* Overworking and skipping meals.
 
-**Safety Note:**
-Seek immediate help if breathing becomes difficult.`,
+**Safety Note:** If stress leads to panic attacks or chest pain, consult a doctor.`;
+  }
 
-    acidity: `**Possible Cause:**\nHeat buildup in the digestive tract.
+  if (is(['cough', 'cold', 'throat', 'respiratory', 'mucus', 'phlegm', 'breathing'])) {
+    return `**Possible Cause:** Excess Kapha (mucus) and reduced digestive fire.
 
 **Try:**
-• Drink cool water mixed with a teaspoon of organic sugar.
-• Chew on a small piece of licorice root.
-• Keep a regular meal schedule to ease stomach acids.
+* Drink warm Tulsi-ginger-black pepper tea (Kadha).
+* Take 1/2 tsp Sitopaladi Churna with honey.
+* Practice steam inhalation with eucalyptus.
 
 **Avoid:**
-• Carbonated drinks and spicy dishes.
-• Eating late at night.
+* Cold drinks, ice cream, and yogurt.
+* Heavy meals and dairy products.
 
-**Safety Note:**
-Consult a doctor if heartburn is severe or daily.`,
+**Safety Note:** If cough lasts more than a week or breathing is difficult, consult a doctor.`;
+  }
 
-    stress: `**Possible Cause:**\nMental tension and overworking the nervous system.
+  if (is(['skin', 'acne', 'pimple', 'rash', 'eczema', 'itching', 'glow'])) {
+    return `**Possible Cause:** Aggravated Pitta and toxins (Ama) in the blood.
 
 **Try:**
-• Rub warm oil behind your ears before bed.
-• Drink warm chamomile or rose tea.
-• Spend 5 minutes sitting in absolute silence.
+* Drink Neem tea twice daily to purify blood.
+* Apply a paste of neem and turmeric to affected areas.
+* Eat sweet, juicy fruits like pomegranates.
 
 **Avoid:**
-• Drinking coffee in the afternoon or evening.
-• Checking work screens after sunset.
+* Spicy, sour, and fermented foods.
+* Refined sugar and heavy dairy.
 
-**Safety Note:**
-Seek professional help for severe or persistent anxiety.`,
+**Safety Note:** If skin condition is severe, painful, or spreads rapidly, consult a doctor.`;
+  }
 
-    insomnia: `**Possible Cause:**\nAn overactive mind causing restlessness at night.
+  if (is(['weight', 'fat', 'obese', 'metabolism', 'slim'])) {
+    return `**Possible Cause:** Sluggish Agni (digestive fire) and Kapha accumulation.
 
 **Try:**
-• Keep your bedroom quiet and completely dark.
-• Read a physical book instead of looking at screens.
-• Practice slow, deep breaths while lying down.
+* Drink warm water with ginger and lemon each morning.
+* Take Trikatu powder (1/4 tsp) before meals.
+* Walk briskly for 30 minutes daily.
 
 **Avoid:**
-• Exercising late in the evening.
-• Taking long naps during the day.
+* Fried foods and cold drinks.
+* Sleeping during the day.
 
-**Safety Note:**
-See a doctor if sleep issues persist beyond two weeks.`,
+**Safety Note:** For sudden weight changes or chronic metabolic issues, consult a doctor.`;
+  }
 
-    bloating_constipation: `**Possible Cause:**\nSlow digestive movement leading to gas buildup.
+  // Generic helpful response for unknown queries
+  const topic = msg.length > 40 ? msg.substring(0, 40) + '...' : msg;
+  return `**Possible Cause:** Imbalance in your bodily doshas related to: "${topic}".
 
 **Try:**
-• Sip warm water mixed with a pinch of cumin.
-• Eat fully cooked, warm meals instead of raw foods.
-• Massage your lower abdomen in gentle clockwise circles.
+* Drink warm ginger water in the morning.
+* Take 1 tsp Triphala in warm water before bed.
+* Practice 10 minutes of Anulom Vilom daily.
 
 **Avoid:**
-• Eating dry snacks like chips or popcorn.
-• Carbonated sodas and cold drinks.
+* Cold, stale, or highly processed foods.
+* Eating when not hungry.
 
-**Safety Note:**
-Seek medical help for severe abdominal pain or vomiting.`,
-
-    joint_pain: `**Possible Cause:**\nJoint stiffness and irritation from wear or cold.
-
-**Try:**
-• Keep the affected joints covered and warm.
-• Take warm baths to ease muscle stiffness.
-• Do gentle range-of-motion stretches daily.
-
-**Avoid:**
-• Cold showers or cold wind exposure.
-• Standing or sitting in one spot too long.
-
-**Safety Note:**
-Consult a doctor if joints are red, swollen, or warm.`,
-
-    headache: `**Possible Cause:**\nDehydration, neck tension, or eye strain.
-
-**Try:**
-• Apply gentle pressure to the temples and neck.
-• Eat a sweet fruit like a ripe apple.
-• Take a 10-minute screen break immediately.
-
-**Avoid:**
-• Skipping lunch or regular meals.
-• Working in bright or harsh lighting.
-
-**Safety Note:**
-Seek emergency care for sudden, severe headache with stiff neck.`,
-
-    skin: `**Possible Cause:**\nBody heat and internal irritation showing on the skin.
-
-**Try:**
-• Wash your face with lukewarm water only.
-• Sip rose water infusion during the day.
-• Use a clean towel every day.
-
-**Avoid:**
-• Wearing heavy makeup on active breakouts.
-• Scrubbing the skin aggressively.
-
-**Safety Note:**
-Consult a dermatologist if the rash spreads rapidly.`,
-
-    weight: `**Possible Cause:**\nA sluggish metabolism and inactive habits.
-
-**Try:**
-• Eat your largest meal at lunch when digestion is strongest.
-• Chew your food thoroughly before swallowing.
-• Drink a cup of hot water after your meals.
-
-**Avoid:**
-• Eating when you are not genuinely hungry.
-• Cold foods and heavy desserts.
-
-**Safety Note:**
-Consult a physician for sudden weight changes.`
-  };
-
-  if (cond && replies[cond]) return replies[cond];
-
-  return `**Possible Cause:**\nMore information is needed to understand your symptoms fully.
-
-**Try:**
-• Describe when your symptoms started.
-• Mention if the issue is dry or warm.
-• Sip warm water to support your body.
-
-**Avoid:**
-• Heavy or fried foods for now.
-• Straining your body with hard work.
-
-**Safety Note:**
-Consult a doctor for any worsening symptoms.`;
+**Safety Note:** For severe, chronic, or worsening symptoms, consult a doctor.`;
 }
 
-/* ─── Message rendering ──────────────────────────────────────────────────── */
 function refreshMessages() {
   const messagesDiv = document.getElementById('ayc-messages');
   if (!messagesDiv) return;
+  // Remove any orphaned thinking bubbles before full re-render
   messagesDiv.querySelectorAll('[id^="ayc-thinking-"]').forEach(el => el.remove());
   messagesDiv.innerHTML = renderWelcome() + renderHistory(state.chatHistory);
 }
 
 function renderHistory(history) {
+  // Filter out any empty, null, or whitespace-only messages before rendering
   return history
     .filter(m => m && m.role && m.content && typeof m.content === 'string' && m.content.trim().length > 0)
     .map(m => `
@@ -1169,71 +1189,15 @@ function renderHistory(history) {
     `).join('');
 }
 
+// Format AI responses with simple markdown-like improvements
 function formatMessage(content) {
   if (typeof content !== 'string') return '';
-
-  // Split content into lines to parse lists and paragraphs
-  const lines = content.split('\n');
-  let html = '';
-  let inList = false;
-  let listType = null; // 'ul' or 'ol'
-
-  for (let i = 0; i < lines.length; i++) {
-    let line = lines[i].trim();
-    if (!line) {
-      if (inList) {
-        html += `</${listType}>`;
-        inList = false;
-        listType = null;
-      }
-      continue;
-    }
-
-    // Check if line is a bullet point
-    const bulletMatch = line.match(/^[•\-\*]\s+(.*)/);
-    // Check if line is a numbered list item
-    const numberMatch = line.match(/^(\d+)\.\s+(.*)/);
-
-    if (bulletMatch) {
-      if (!inList || listType !== 'ul') {
-        if (inList) html += `</${listType}>`;
-        html += '<ul style="margin: 8px 0; padding-left: 20px; list-style-type: disc;">';
-        inList = true;
-        listType = 'ul';
-      }
-      html += `<li style="margin-bottom: 4px;">${parseInlineMarkdown(bulletMatch[1])}</li>`;
-    } else if (numberMatch) {
-      if (!inList || listType !== 'ol') {
-        if (inList) html += `</${listType}>`;
-        html += '<ol style="margin: 8px 0; padding-left: 20px; list-style-type: decimal;">';
-        inList = true;
-        listType = 'ol';
-      }
-      html += `<li style="margin-bottom: 4px;">${parseInlineMarkdown(numberMatch[2])}</li>`;
-    } else {
-      if (inList) {
-        html += `</${listType}>`;
-        inList = false;
-        listType = null;
-      }
-      html += `<p style="margin: 8px 0 0; line-height: 1.65;">${parseInlineMarkdown(line)}</p>`;
-    }
-  }
-
-  if (inList) {
-    html += `</${listType}>`;
-  }
-
-  return html;
-}
-
-function parseInlineMarkdown(text) {
-  let escaped = escapeHtml(text);
-  // Replace bold **text**
-  escaped = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-  // Replace italic *text* or _text_
-  escaped = escaped.replace(/\*(.*?)\*/g, '<em>$1</em>');
-  return escaped;
+  const escaped = escapeHtml(content);
+  // Convert **bold** to <strong>
+  return escaped
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n{2,}/g, '</p><p style="margin:8px 0 0;">')
+    .replace(/\n/g, '<br>');
 }
 
 function scrollChat() {

@@ -30,7 +30,7 @@ router.post("/", validateChatRequest, async (req, res, next) => {
     const systemPrompt = buildChatPrompt(persona, previousResponseSummary, isAyurveda);
     const messages = buildChatMessages(trimmedHistory, message);
 
-    const reply = await callClaudeChat(systemPrompt, messages, 300);
+    const reply = await callClaudeChat(systemPrompt, messages, 350);
 
     res.json({
       success: true,
@@ -50,93 +50,77 @@ router.post("/", validateChatRequest, async (req, res, next) => {
 router.post("/flow", async (req, res, next) => {
   try {
     const { message } = req.body;
-    if (!message) {
+    if (!message || !message.trim()) {
       return res.status(400).json({ success: false, error: "Message is required" });
     }
 
-    const systemPrompt = `You are an expert Ayurvedic wellness assistant.
-Based on the user's health concern, generate a personalized healing protocol.
+    const systemPrompt = `You are an expert traditional Ayurvedic physician (Vaidya) with deep knowledge of Charaka Samhita and Sushruta Samhita.
 
-RESPONSE RULES:
-1. FIRST CHECK: Determine if the query is related to health concerns, symptoms, Ayurveda, wellness, or herbs. If it is NOT (for example: general knowledge, history, programming, or queries like 'who is arjun'), you MUST return exactly this JSON:
-{
-  "success": false,
-  "error": "unrelated"
-}
-Do not generate a wellness protocol or do any analysis for unrelated queries.
-2. Identify the user's condition correctly.
-3. Use simple, everyday English. Avoid complex Ayurvedic terminology such as: Kapha, Pitta, Vata, Ama, Srotas, Agni, Dinacharya, Nasya, Pranayama. Explain health concerns in plain English.
-4. Focus on practical advice: what to do, what to avoid, when to seek medical help.
-5. Do not provide medicine dosages.
-6. Keep steps concise and clear.
-7. For serious conditions (cancer, heart disease, stroke, severe breathing problems), provide supportive wellness guidance only and clearly recommend consulting a doctor.
+Based on the user's health concern, generate a personalized Ayurvedic healing protocol.
 
 CRITICAL: Respond ONLY with a single valid JSON object. No markdown, no code fences, no explanation text. Start your response with { and end with }.
 
-The JSON must follow this EXACT structure for related queries:
+The JSON must follow this EXACT structure:
 {
   "success": true,
-  "title": "A specific title (e.g. 'Cooling Protocol for Acid Reflux')",
-  "doshaAnalysis": "1-2 sentences in plain English explaining the possible cause of the symptoms",
+  "title": "A specific title describing the healing protocol (e.g. 'Pitta Pacification Protocol for Acid Reflux')",
+  "doshaAnalysis": "2-3 sentences explaining which doshas are imbalanced and why, based on the symptoms described",
   "steps": [
     {
       "step": 1,
-      "title": "Phase 1: Initial Care (Week 1)",
-      "desc": "Simple daily tips and foods to try. Focus on practical suggestions."
+      "title": "Phase 1: Cleansing & Detox (Weeks 1-2)",
+      "desc": "Specific dietary adjustments and herbal teas to begin with. Name specific herbs and foods."
     },
     {
       "step": 2,
-      "title": "Phase 2: Core Remedies (Weeks 2-4)",
-      "desc": "Simple herbal teas or natural foods to eat and drink. No dosages."
+      "title": "Phase 2: Core Herbal Remedy (Weeks 2-6)",
+      "desc": "Main herbal formulas, dosages, and preparation methods. Be specific about herb names."
     },
     {
       "step": 3,
-      "title": "Phase 3: Long-term Habits",
-      "desc": "Simple lifestyle practices and things to continue for long-term health."
+      "title": "Phase 3: Lifestyle & Maintenance",
+      "desc": "Daily routines (dinacharya), yoga asanas, pranayama, and dietary habits for long-term balance."
     }
   ],
-  "warning": "A short safety warning if needed."
+  "warning": "Safety warnings, contraindications, and when to consult a physician."
 }`;
 
     let flowData;
     try {
       flowData = await callClaudeJSON(systemPrompt, `Patient's concern: ${message.trim()}`, 1500);
-      if (flowData.success === false || flowData.error === "unrelated") {
-        // Safe to return, it's unrelated
-      } else {
-        // Ensure required fields exist
-        if (!flowData.title || !flowData.steps || !Array.isArray(flowData.steps) || flowData.steps.length === 0) {
-          throw new Error("Incomplete flow data returned");
-        }
-        flowData.success = true;
+      // Ensure required fields exist
+      if (!flowData.title || !flowData.steps || !Array.isArray(flowData.steps) || flowData.steps.length === 0) {
+        throw new Error("Incomplete flow data returned");
       }
+      flowData.success = true;
     } catch (parseErr) {
       console.error("[Flow parse error]", parseErr.message);
       // Return a meaningful fallback instead of 500
       flowData = {
         success: true,
-        title: "General Wellness Protocol",
-        doshaAnalysis: "Based on your concern, we recommend starting with basic digestive wellness and a regular daily routine.",
+        title: "General Ayurvedic Wellness Protocol",
+        doshaAnalysis: "Based on your concern, a tridoshic (Vata, Pitta, Kapha) balancing approach is recommended. Please consult a qualified Vaidya for a complete personalized assessment.",
         steps: [
           {
             step: 1,
-            title: "Phase 1: Clear Liquids",
-            desc: "Begin with sipping warm water throughout the day. Avoid cold drinks and heavy foods for a few days to let your digestion rest."
+            title: "Phase 1: Ama (Toxin) Cleanse",
+            desc: "Begin with warm water with ginger and lemon each morning. Avoid heavy, processed, and cold foods for 1-2 weeks. Triphala churna (1 tsp in warm water) before bed supports digestive detox."
           },
           {
             step: 2,
-            title: "Phase 2: Light Meals",
-            desc: "Focus on warm, freshly cooked, easily digestible meals. Include mild spices like ginger and cumin in your cooking."
+            title: "Phase 2: Core Herbal Support",
+            desc: "Ashwagandha for Vata (nervous system), Shatavari or Guduchi for Pitta (inflammation), and Trikatu for Kapha (digestion). Take as advised by a practitioner — typically 500mg twice daily with warm water."
           },
           {
             step: 3,
-            title: "Phase 3: Steady Rest",
-            desc: "Follow a regular sleep schedule. Take gentle walks after your meals and practice slow, deep breathing to manage daily stress."
+            title: "Phase 3: Lifestyle Integration",
+            desc: "Follow a regular sleep schedule (10pm–6am). Practice Anulom Vilom pranayama daily (10 min). Eat warm, cooked meals. Minimize stress through meditation and gentle yoga."
           }
         ],
-        warning: "These guidelines are for general wellness only. Always consult a healthcare professional for persistent, severe, or worsening symptoms."
+        warning: "These guidelines are for general wellness only. Always consult a qualified Ayurvedic practitioner before starting any herbal regimen, especially if pregnant, nursing, or on medications."
       };
     }
+
     res.json(flowData);
   } catch (err) {
     next(err);
