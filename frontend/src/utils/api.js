@@ -5,7 +5,7 @@
  *   import { fetchWisdom, fetchPersonas, fetchChat, fetchQuiz, switchPersona } from './utils/api.js';
  */
 
-import { BACKEND_URL, RAG_BACKEND_URL } from '../config.js';
+import { BACKEND_URL } from '../config.js';
 
 const BASE_URL = `${BACKEND_URL}/api`;
 async function handleResponse(res) {
@@ -62,8 +62,8 @@ export async function switchPersona(problem, previousPersona, newPersona) {
  * @param {string} previousResponseSummary
  */
 export async function fetchChat(persona, message, history, previousResponseSummary) {
-  console.log("👉 Calling RAG API...");
-  const res = await fetch(`${RAG_BACKEND_URL}/chat`, {
+  console.log("👉 Calling OpenRouter Chat API...");
+  const res = await fetch(`${BASE_URL}/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ persona, message, history, previousResponseSummary }),

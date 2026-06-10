@@ -103,6 +103,8 @@ function injectLearnStyles() {
 .l-nav-ctr{font-size:13px;color:var(--text-dim)}
 @keyframes lFadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 @keyframes lFadeIn{from{opacity:0}to{opacity:1}}
+.l-solve-btn{background:linear-gradient(135deg,#3A9B8C 0%,#2E7D71 100%);border:none;border-radius:var(--r-md);color:#ffffff;padding:12px 24px;font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:1px;cursor:pointer;transition:all 0.3s;box-shadow:0 4px 15px rgba(58,155,140,0.25);display:inline-flex;align-items:center;gap:8px;margin-top:20px}
+.l-solve-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(58,155,140,0.4);background:linear-gradient(135deg,#42b2a1 0%,#328a7c 100%)}
   `;
   document.head.appendChild(s);
 }
@@ -475,7 +477,11 @@ function renderDetail() {
       <div class="ld-sec">
         <div class="ld-lbl">Modern Science</div>
         <div class="ld-text">${item.sci}</div>
-      </div>`;
+      </div>
+      ${curIdx === 0 ? `
+      <div class="ld-sec" style="margin-top: 30px; text-align: center; border-top: 1px solid var(--gold-border); padding-top: 20px;">
+        <button id="l-solve-problem-btn" class="l-solve-btn">🌿 Solve My Problem</button>
+      </div>` : ''}`;
   }
 
   else if (t === 'artha') {
@@ -516,6 +522,14 @@ function renderDetail() {
   const next = document.getElementById('l-next');
   if (prev) prev.addEventListener('click', () => navigate(-1));
   if (next) next.addEventListener('click', () => navigate(1));
+
+  const solveBtn = document.getElementById('l-solve-problem-btn');
+  if (solveBtn) {
+    solveBtn.addEventListener('click', () => {
+      actions.setSolveMode('ayurveda');
+      actions.selectPersona('guru');
+    });
+  }
 }
 
 /* ══════════════════════════════════════
@@ -556,10 +570,10 @@ function attachEvents() {
       closeDetail();
       return;
     }
-    // Solve Ayurvedic
+    // Solve Ayurvedic — go directly to AyurvedaChat, skip persona select
     if (el.id === 'btn-ayurveda-solve') {
       actions.setSolveMode('ayurveda');
-      actions.goTo('problem');
+      actions.selectPersona('guru');
       return;
     }
   });

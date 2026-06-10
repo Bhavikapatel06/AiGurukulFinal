@@ -191,10 +191,15 @@ export function updateChatbotMessages(container, prevLength) {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 
+function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
 function renderMessageList(history) {
   return history.map(msg => `
     <div class="chat-bubble ${msg.role === 'user' ? 'user' : 'assistant'}">
-      ${msg.content}
+      ${escapeHtml(msg.content)}
     </div>
   `).join('');
 }

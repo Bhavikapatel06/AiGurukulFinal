@@ -51,7 +51,7 @@ async function callOpenRouter(systemPrompt, messages, maxTokens) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: "google/gemini-2.0-flash-lite-preview-02-05:free", // Using free model to prevent credit exhaustion
+      model: "openrouter/free", // Using free model to prevent credit exhaustion
       messages: [
         { role: "system", content: systemPrompt },
         ...messages

@@ -50,12 +50,13 @@ export function renderPersonaSelect(container) {
     </div>
 
     <div class="persona-body">
-      <h2 class="text-center anim-fade-up">Who will guide you today?</h2>
+      <h2 class="text-center anim-fade-up">Choose Your Guide</h2>
+      ${state.solveMode !== 'chat' && state.solveMode !== 'ayurveda' ? `
       <p class="text-center anim-fade-up delay-1">
         Same wisdom, different lenses. Choose the perspective that resonates.
-      </p>
+      </p>` : ''}
 
-      ${state.solveMode !== 'chat' ? `
+      ${state.solveMode !== 'chat' && state.solveMode !== 'ayurveda' ? `
       <div class="problem-preview anim-fade-up delay-2">
         <span class="problem-preview-label">Your question</span>
         <span class="problem-preview-text">"${escapeHtml(state.problem)}"</span>
@@ -109,5 +110,6 @@ export function renderPersonaSelect(container) {
 }
 
 function escapeHtml(str) {
+  if (typeof str !== 'string') return '';
   return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }

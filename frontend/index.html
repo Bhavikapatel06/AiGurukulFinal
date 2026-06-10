@@ -2479,6 +2479,7 @@
     import { renderResponseCards, renderLoading } from './src/components/ResponseCards.js';
     import { renderChatSidebar, updateChatMessages } from './src/components/ChatSidebar.js';
     import { renderChatbotOnly, updateChatbotMessages } from './src/components/ChatbotOnly.js';
+    import { renderAyurvedaChat } from './src/components/AyurvedaChat.js';
     import { renderReflectionQuiz } from './src/components/ReflectionQuiz.js';
     import { renderXPBar, updateXPBar, showLevelUpToast } from './src/components/XPSystem.js';
     import { renderLearn } from './src/components/Learn.js';
@@ -2562,13 +2563,22 @@ import { renderAuth } from './src/components/Auth.js';
           document.getElementById('response-back-btn').onclick = () => actions.goTo('persona');
           break;
         case 'chatbot':
-          if (!screens.chatbot.querySelector('.chatbot-header')) {
-            prevChatLen = 0;
-            screens.chatbot.innerHTML = '';
-            renderChatbotOnly(screens.chatbot);
+          if (state.solveMode === 'ayurveda') {
+            // Always re-render AyurvedaChat fresh (new wrapper class: .ayc-wrapper)
+            if (!screens.chatbot.querySelector('.ayc-wrapper')) {
+              prevChatLen = 0;
+              screens.chatbot.innerHTML = '';
+              renderAyurvedaChat(screens.chatbot);
+            }
           } else {
-            updateChatbotMessages(screens.chatbot, prevChatLen);
-            prevChatLen = s.chatHistory.length;
+            if (!screens.chatbot.querySelector('.chatbot-header')) {
+              prevChatLen = 0;
+              screens.chatbot.innerHTML = '';
+              renderChatbotOnly(screens.chatbot);
+            } else {
+              updateChatbotMessages(screens.chatbot, prevChatLen);
+              prevChatLen = s.chatHistory.length;
+            }
           }
           break;
 case 'learn':

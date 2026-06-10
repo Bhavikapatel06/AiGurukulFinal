@@ -212,8 +212,8 @@ export const actions = {
 
   /** Select a persona and fetch wisdom */
   async selectPersona(persona) {
-    // In chat mode (Solve My Problem), we skip problem validation
-    if (state.solveMode !== 'chat' && !state.problem.trim()) {
+    // In chat or ayurveda mode, we skip problem validation
+    if (state.solveMode !== 'chat' && state.solveMode !== 'ayurveda' && !state.problem.trim()) {
       state.error = 'Please enter your problem first.';
       notify();
       return;
@@ -226,7 +226,7 @@ export const actions = {
     state.loading = true;
     state.error = null;
     
-    if (state.solveMode === 'chat') {
+    if (state.solveMode === 'chat' || state.solveMode === 'ayurveda') {
       state.screen = 'chatbot';
       state.loading = false;
       notify();
