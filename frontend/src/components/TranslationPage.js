@@ -13,22 +13,6 @@ export function renderTranslationPage(container) {
       <div class="translate-layout">
         <!-- LEFT PANEL: INPUT -->
         <div class="translate-left">
-          
-          <div class="translate-box">
-            <div class="box-header">
-              <span class="box-icon">📜</span>
-              <span class="box-title">INPUT TEXT OR FILE</span>
-            </div>
-            <textarea id="translate-input" class="translate-textarea" placeholder="Paste ancient text here (Sanskrit, Tamil, Pali, etc.)..."></textarea>
-            
-            <div class="translate-upload" id="translate-upload-btn">
-              <span class="upload-icon">📷</span>
-              <div class="upload-text">Upload manuscript image or PDF</div>
-              <div class="upload-sub" id="upload-filename">For demo: hardcoded text will be used. Max 5MB.</div>
-            </div>
-            <input type="file" id="translate-file-input" accept="image/*,.pdf" style="display:none;" />
-          </div>
-          
           <div class="translate-controls">
             <div class="lang-selector">
               <label class="lang-label">SOURCE</label>
@@ -48,31 +32,24 @@ export function renderTranslationPage(container) {
             </div>
           </div>
           
+          <div class="translate-box">
+            <div class="box-header">
+              <span class="box-icon">📜</span>
+              <span class="box-title">INPUT TEXT OR FILE</span>
+            </div>
+            <textarea id="translate-input" class="translate-textarea" placeholder="Paste ancient text here (Sanskrit, Tamil, Pali, etc.)..."></textarea>
+            
+            <div class="translate-upload" id="translate-upload-btn">
+              <span class="upload-icon">📷</span>
+              <div class="upload-text">Upload manuscript image or PDF</div>
+              <div class="upload-sub" id="upload-filename">For demo: hardcoded text will be used. Max 5MB.</div>
+            </div>
+            <input type="file" id="translate-file-input" accept="image/*,.pdf" style="display:none;" />
+          </div>
+          
           <button id="btn-do-translate" class="btn-primary w-full mt-2" style="padding: 10px; font-size: 14px;">
             <span class="mode-icon" style="font-size:16px;">🔄</span> Translate & Analyze
           </button>
-          
-          <div class="sample-texts mt-3">
-            <div class="box-header">
-              <span class="box-icon">📚</span>
-              <span class="box-title">SAMPLE TEXTS</span>
-            </div>
-            <div class="sample-card" data-text="स्वस्थस्य स्वास्थ्य रक्षणं आतुरस्य विकार प्रशमनं च।">
-              <div class="sample-title">Charaka Samhita — Sutra Sthana</div>
-              <div class="sample-excerpt">स्वस्थस्य स्वास्थ्य रक्षणं आतुरस्य विकार प्रशमनं च।</div>
-            </div>
-            
-            <div class="sample-card" data-text="चतुरधिकं शतमष्टगुणं द्वाषष्टिस्तथा सहस्राणाम्। अयुतद्वयविष्कम्भस्य आसन्नो वृत्तपरिणाहः।।">
-              <div class="sample-title">Aryabhatiya — Ganitapada</div>
-              <div class="sample-excerpt">चतुरधिकं शतमष्टगुणं द्वाषष्टिस्तथा सहस्राणाम्। अयुतद्वयविष्कम्भस्य आसन्नो वृत्तपरिणाहः।।</div>
-            </div>
-            
-            <div class="sample-card" data-text="கற்க கசடறக் கற்பவை கற்றபின் நிற்க அதற்குத் தக.">
-              <div class="sample-title">Thirukkural — Kural 391</div>
-              <div class="sample-excerpt">கற்க கசடறக் கற்பவை கற்றபின் நிற்க அதற்குத் தக.</div>
-            </div>
-          </div>
-          
         </div>
         
         <!-- RIGHT PANEL: OUTPUT -->
@@ -87,6 +64,28 @@ export function renderTranslationPage(container) {
             <!-- Rendered results will go here -->
           </div>
         </div>
+        
+        <div class="sample-texts mt-3">
+          <div class="box-header">
+            <span class="box-icon">📚</span>
+            <span class="box-title">SAMPLE TEXTS</span>
+          </div>
+          <div class="sample-card" data-text="स्वस्थस्य स्वास्थ्य रक्षणं आतुरस्य विकार प्रशमनं च।">
+            <div class="sample-title">Charaka Samhita — Sutra Sthana</div>
+            <div class="sample-excerpt">स्वस्थस्य स्वास्थ्य रक्षणं आतुरस्य विकार प्रशमनं च।</div>
+          </div>
+          
+          <div class="sample-card" data-text="चतुरधिकं शतमष्टगुणं द्वाषष्टिस्तथा सहस्राणाम्। अयुतद्वयविष्कम्भस्य आसन्नो वृत्तपरिणाहः।।">
+            <div class="sample-title">Aryabhatiya — Ganitapada</div>
+            <div class="sample-excerpt">चतुरधिकं शतमष्टगुणं द्वाषष्टिस्तथा सहस्राणाम्। अयुतद्वयविष्कम्भस्य आसन्नो वृत्तपरिणाहः।।</div>
+          </div>
+          
+          <div class="sample-card" data-text="கற்க கசடறக் கற்பவை கற்றபின் நிற்க அதற்குத் தக.">
+            <div class="sample-title">Thirukkural — Kural 391</div>
+            <div class="sample-excerpt">கற்க கசடறக் கற்பவை கற்றபின் நிற்க அதற்குத் தக.</div>
+          </div>
+        </div>
+        
       </div>
     </div>
   `;
@@ -117,10 +116,18 @@ export function renderTranslationPage(container) {
   const outEmpty = container.querySelector('#translate-output-empty');
   const outContent = container.querySelector('#translate-output-content');
 
+  // Auto-grow textarea
+  const resizeTextarea = () => {
+    inputBox.style.height = 'auto';
+    inputBox.style.height = inputBox.scrollHeight + 'px';
+  };
+  inputBox.addEventListener('input', resizeTextarea);
+
   // Connect samples
   samples.forEach(card => {
     card.addEventListener('click', () => {
       inputBox.value = card.dataset.text;
+      resizeTextarea();
     });
   });
 

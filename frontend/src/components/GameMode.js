@@ -19,6 +19,7 @@ let puzzleCompleted = false;
 let correctlyGuessed = false;
 let currentScreen = '';
 let currentLevelLoaded = null;
+let tutorialsShown = {};
 
 export function renderGame(container) {
   const screen = state.screen;
@@ -238,6 +239,11 @@ function renderPuzzlePlay(container) {
   container.querySelector('#guess-input').onkeyup = (e) => { if (e.key === 'Enter') handleGuess(container); };
 
   attachHeaderEvents(container);
+
+  if (level === 1 && !tutorialsShown[user]) {
+    tutorialsShown[user] = true;
+    showTutorialModal(container);
+  }
 }
 
 function renderPuzzleBoard(container) {
@@ -354,23 +360,91 @@ function addHintForPiece(pieceId, container) {
   }
 }
 
+function showTutorialModal(container) {
+  const portal = container.querySelector('#game-modal-portal');
+  if (!portal) return;
+  portal.innerHTML = `
+    <div class="hint-modal-overlay" id="tutorial-overlay">
+      <div class="hint-modal-content tutorial-modal" style="max-width: 450px; padding: 40px 25px;">
+        <button class="hint-modal-close" id="tutorial-close-btn">&times;</button>
+        
+        <div class="tutorial-header">
+          <div class="hint-icon" style="font-size: 50px; animation: floatIcon 3s ease-in-out infinite;">📜</div>
+          <h2 style="font-size: 26px; margin-bottom: 5px; color: var(--gold);">How to Play</h2>
+          <p style="color: #aaa; font-size: 12px; margin-bottom: 25px; letter-spacing: 2px; text-transform: uppercase;">Your Journey Begins Here</p>
+        </div>
+
+        <div class="tutorial-steps">
+          <div class="tutorial-step">
+            <div class="step-icon">🧩</div>
+            <div class="step-text">
+              <h4>Slide Pieces</h4>
+              <p>Tap a puzzle piece next to the empty slot to slide it.</p>
+            </div>
+          </div>
+          
+          <div class="tutorial-step">
+            <div class="step-icon">💡</div>
+            <div class="step-text">
+              <h4>Unlock Hints</h4>
+              <p>Place a piece in its correct spot to reveal a Divine Hint.</p>
+            </div>
+          </div>
+          
+          <div class="tutorial-step">
+            <div class="step-icon">🤔</div>
+            <div class="step-text">
+              <h4>Guess the Name</h4>
+              <p>Use hints to guess the answer! Earlier guesses earn more 🪙.</p>
+            </div>
+          </div>
+          
+          <div class="tutorial-step">
+            <div class="step-icon">🏆</div>
+            <div class="step-text">
+              <h4>Complete & Earn</h4>
+              <p>Finish the puzzle to progress and unlock Avatar shop items!</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-game tutorial-start-btn" id="tutorial-start-btn">START JOURNEY ✨</button>
+      </div>
+    </div>
+  `;
+  
+  const closeHandler = () => { portal.innerHTML = ''; };
+  portal.querySelector('#tutorial-close-btn').onclick = closeHandler;
+  portal.querySelector('#tutorial-start-btn').onclick = closeHandler;
+}
+
 function showHintModal(hint, container) {
   const portal = container.querySelector('#game-modal-portal');
   portal.innerHTML = `
     <div class="hint-modal-overlay">
       <div class="hint-modal-content">
-        <h2>✨ Insight Revealed</h2>
-        <p>"${hint}"</p>
-        <p style="margin-top:20px; font-size:12px; color:var(--gold-dim);">Look at the clues to Guess the Name!</p>
+        <button class="hint-modal-close" id="hint-modal-close-btn">&times;</button>
+        <div class="hint-icon">💡</div>
+        <h2>Divine Insight</h2>
+        <div class="hint-text-box">
+          <p>"${hint}"</p>
+        </div>
+        <p class="hint-subtext">Look at the clues to Guess the Name!</p>
       </div>
     </div>
   `;
+  
+  const closeBtn = portal.querySelector('#hint-modal-close-btn');
+  closeBtn.onclick = () => {
+    portal.innerHTML = '';
+    if (hintModalTimeout) clearTimeout(hintModalTimeout);
+  };
   
   if (hintModalTimeout) clearTimeout(hintModalTimeout);
   hintModalTimeout = setTimeout(() => {
     portal.innerHTML = '';
     hintModalTimeout = null;
-  }, 5000);
+  }, 6000);
 }
 
 function handleGuess(container) {
@@ -444,13 +518,20 @@ function renderStore(container) {
     return { ...item, ...ref };
   });
 
+  const defaultAvatars = {
+    'ramayana': 'src/assets/game/rama_3d.png',
+    'mahabharata': 'src/assets/game/krishna_3d.png',
+    'ayurveda': 'https://images.unsplash.com/photo-1624494052342-990520bc973c?q=80&w=600&h=600&auto=format&fit=crop',
+    'temples': 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?q=80&w=600&h=600&auto=format&fit=crop'
+  };
+
   container.innerHTML = `
     ${getGameHeaderHTML(`${userData.name}'s Divine Boutique`)}
     <div class="store-layout">
       <!-- Left side: Avatar Preview -->
       <div class="avatar-preview-section">
-        <div class="avatar-container">
-          <img src="${currentLevelData ? currentLevelData.cartoon : `src/assets/game/${user}_cartoon.png`}" class="avatar-base-img" alt="${userData.name}">
+        <div class="avatar-container" id="avatar-container">
+          <img src="${currentLevelData ? currentLevelData.cartoon : defaultAvatars[user]}" class="avatar-base-img" alt="${userData.name}">
           
           <!-- Layered Owned Items -->
           <div class="avatar-overlays" id="avatar-overlays">
@@ -503,6 +584,24 @@ function renderStore(container) {
       };
     }
   });
+
+  // 3D Tilt interaction for Talking-Tom vibe
+  const avatarCont = container.querySelector('#avatar-container');
+  if (avatarCont) {
+    avatarCont.onmousemove = (e) => {
+      const rect = avatarCont.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const tiltX = (y - centerY) / 10;
+      const tiltY = (centerX - x) / 10;
+      avatarCont.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
+    };
+    avatarCont.onmouseleave = () => {
+      avatarCont.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
+    };
+  }
 
   attachHeaderEvents(container);
 }

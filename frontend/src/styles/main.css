@@ -1,7 +1,3 @@
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   AI Gurukul â€” Global Stylesheet
-   Dark gold theme. Import this in index.html.
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
 
@@ -219,10 +215,14 @@ code {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 18px 28px;
+  padding: 16px 24px;
   border-bottom: 1px solid var(--gold-border);
   min-height: 64px;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 100;
 }
 
 .screen-header-title {
@@ -912,3 +912,13 @@ code {
   text-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
 }
 
+@media(max-width: 768px) {
+  .screen-header {
+    padding: 12px 16px;
+    gap: 12px;
+  }
+  .screen-header-title {
+    font-size: 14px;
+    letter-spacing: 0.5px;
+  }
+}

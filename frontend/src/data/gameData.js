@@ -16,7 +16,7 @@ export const LEVELS = {
       id: 1,
       name: 'Lord Rama',
       image: 'src/assets/game/rama_real.png',
-      cartoon: 'src/assets/game/rama_cartoon.png',
+      cartoon: 'src/assets/game/rama_3d.png',
       answer: 'rama',
       hints: [
         'He is the seventh avatar of Lord Vishnu.',
@@ -89,7 +89,7 @@ export const LEVELS = {
       id: 1,
       name: 'Lord Krishna',
       image: 'src/assets/game/krishna_real.png',
-      cartoon: 'src/assets/game/krishna_cartoon.png',
+      cartoon: 'src/assets/game/krishna_3d.png',
       answer: 'krishna',
       hints: [
         'He delivered the Bhagavad Gita to Arjuna.',
