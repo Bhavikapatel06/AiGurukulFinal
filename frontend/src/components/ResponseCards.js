@@ -70,7 +70,7 @@ export function renderResponseCards(container) {
         <span class="card-icon">🧠</span>
         <span class="card-label">The Lesson</span>
       </div>
-      <blockquote class="quote-block">${w.lesson}</blockquote>
+      <blockquote class="quote-block">${cleanLesson(w.lesson)}</blockquote>
     </div>
 
     <!-- Card 3: Advice -->
@@ -161,4 +161,11 @@ export function renderLoading(container) {
 function escapeHtml(str) {
   if (typeof str !== 'string') return '';
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function cleanLesson(text) {
+  if (!text) return '';
+  return text
+    .replace(/^(?:dear\s+|my\s+)?(?:friend|arjuna|seeker)[\s,.-]+/i, '')
+    .replace(/^[a-z]/, c => c.toUpperCase());
 }

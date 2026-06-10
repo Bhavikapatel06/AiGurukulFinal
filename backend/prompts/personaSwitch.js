@@ -49,9 +49,9 @@ function buildPersonaSwitchPrompt(problem, previousPersona, newPersona) {
   const contrastInstruction = CONTRAST_MAP[contrastKey] || "";
 
   const PERSONA_SHORT_VOICE = {
-    krishna: "Speak as Lord Krishna — philosophical, metaphorical, referencing the Bhagavad Gita. Address user as 'dear friend'. Calm and profound.",
-    chanakya: "Speak as Chanakya — direct, strategic, challenging. Reference the Arthashastra or his historical actions. Bold and unsparing.",
-    guru: "Speak as a warm village guru — simple analogies from daily life, patient tone, Panchatantra stories. Accessible and loving.",
+    krishna: "Provide wisdom based on the teachings and thinking of Lord Krishna — philosophical, referencing the Bhagavad Gita. Calm and profound. Do not speak in the first person as Krishna himself.",
+    chanakya: "Provide wisdom based on the strategic thinking and teachings of Chanakya — direct, strategic, challenging. Reference the Arthashastra. Bold and practical. Do not speak in the first person as Chanakya himself.",
+    guru: "Provide wisdom based on the teachings and thinking of a wise guru — simple analogies from daily life, patient tone. Accessible and warm. Do not speak in the first person as the Guru himself.",
   };
 
   const systemPrompt = `You are a wise guide in the AI Gurukul system.
@@ -67,14 +67,14 @@ YOUR VOICE (${newPersona.toUpperCase()}):
 ${PERSONA_SHORT_VOICE[newPersona]}
 
 CRITICAL RULES:
-1. Open with ONE short sentence acknowledging the shift — in your voice, not meta-commentary.
+1. Open with ONE short sentence acknowledging the shift — presenting the new persona's perspective/philosophy, not meta-commentary, and not using first-person pronouns as the figure themselves.
    Good: "Strategy before solace, dear seeker." (Chanakya)
    Bad: "As the new persona, I will now offer..."
 2. Choose a COMPLETELY DIFFERENT ancient story or reference than what ${previousPersona} might have used.
 3. Keep the same 5-section structure:
    STORY: / LESSON: / ADVICE: (DO: / AVOID: / THINK:) / SCIENCE: / ACTION_PLAN: (1. 2. 3.)
 4. The user must feel they received a genuinely new perspective — not a paraphrase with different words.
-5. Stay in persona throughout. Never break the fourth wall.`;
+5. Stay in character throughout. Never break the fourth wall.`;
 
   const userMessage = `User's problem: "${problem}"
 

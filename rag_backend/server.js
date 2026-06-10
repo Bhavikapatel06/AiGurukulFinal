@@ -25,12 +25,31 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// 1. Initialize Pinecone and Cohere
-const pc = new Pinecone();
-const index = pc.index("aigurukul-index");
+// 1. Initialize Pinecone and Cohere safely
+let pc = null;
+let index = null;
+let cohere = null;
 
-// Global Cohere Client for both Embeddings and Chat Generation!
-const cohere = new CohereClient({ token: process.env.COHERE_API_KEY });
+try {
+  if (process.env.PINECONE_API_KEY) {
+    pc = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
+    index = pc.index("aigurukul-index");
+  } else {
+    console.warn("⚠️ PINECONE_API_KEY is missing. RAG functionality will fall back to AI.");
+  }
+} catch (err) {
+  console.warn("⚠️ Pinecone failed to initialize:", err.message);
+}
+
+try {
+  if (process.env.COHERE_API_KEY) {
+    cohere = new CohereClient({ token: process.env.COHERE_API_KEY });
+  } else {
+    console.warn("⚠️ COHERE_API_KEY is missing. RAG functionality will fall back to AI.");
+  }
+} catch (err) {
+  console.warn("⚠️ Cohere failed to initialize:", err.message);
+}
 // Keywords for auto-detecting persona if not specified
 const keywords = {
   krishna: ['karma', 'peace', 'arjuna', 'meditation', 'dharma', 'gita', 'detachment'],
@@ -159,6 +178,10 @@ app.post('/chat', async (req, res) => {
     const { message, persona } = req.body;
 
     console.log("Incoming:", req.body);
+
+    if (!cohere || !index) {
+      return res.status(500).json({ success: false, error: "Pinecone or Cohere API key is missing. Falling back to AI." });
+    }
 
     const result = await agentExecutor(req.body);
     res.json({ success: true, reply: result.response });

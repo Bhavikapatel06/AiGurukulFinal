@@ -5,7 +5,7 @@
  *   import { fetchWisdom, fetchPersonas, fetchChat, fetchQuiz, switchPersona } from './utils/api.js';
  */
 
-import { BACKEND_URL } from '../config.js';
+import { BACKEND_URL, RAG_BACKEND_URL } from '../config.js';
 
 const BASE_URL = `${BACKEND_URL}/api`;
 async function handleResponse(res) {
@@ -62,13 +62,49 @@ export async function switchPersona(problem, previousPersona, newPersona) {
  * @param {string} previousResponseSummary
  */
 export async function fetchChat(persona, message, history, previousResponseSummary) {
-  console.log("👉 Calling OpenRouter Chat API...");
-  const res = await fetch(`${BASE_URL}/chat`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ persona, message, history, previousResponseSummary }),
-  });
-  return handleResponse(res);
+  console.log("👉 Calling RAG or OpenRouter Chat API...");
+  let reply = null;
+
+  // 1️⃣ Try RAG Backend first
+  try {
+    const ragRes = await fetch(`${RAG_BACKEND_URL}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        persona,
+        message,
+        history: history.map(h => ({ role: h.role, content: h.content }))
+      }),
+    });
+    if (ragRes.ok) {
+      const ragData = await ragRes.json();
+      if (ragData.success && ragData.reply && ragData.reply.trim()) {
+        const possibleReply = ragData.reply.trim();
+        const refusal = "Please ask questions according to the topics covered in my texts. I can only provide answers based on the ancient wisdom provided to me.";
+        if (possibleReply !== refusal) {
+          reply = possibleReply;
+          console.log("✅ Chat response successfully retrieved from RAG backend!");
+        } else {
+          console.log("⚠️ RAG backend refused to answer (out of context), falling back to AI...");
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("⚠️ RAG backend failed, falling back to AI:", err.message);
+  }
+
+  // 2️⃣ If RAG failed or refused, fall back to Main Backend Chat API (Direct AI)
+  if (!reply) {
+    const res = await fetch(`${BASE_URL}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ persona, message, history, previousResponseSummary, isAyurveda: false }),
+    });
+    const data = await handleResponse(res);
+    return data;
+  }
+
+  return { success: true, reply, persona };
 }
 
 /**

@@ -19,12 +19,15 @@ const { validateChatRequest } = require("../middleware/validate");
  */
 router.post("/", validateChatRequest, async (req, res, next) => {
   try {
-    const { persona, message, history, previousResponseSummary = "" } = req.body;
+    const { persona, message, history, previousResponseSummary = "", isAyurveda = false } = req.body;
 
     // Keep last 10 messages max to avoid bloating context
-    const trimmedHistory = history.slice(-10);
+    let trimmedHistory = history.slice(-10);
+    if (trimmedHistory.length > 0 && trimmedHistory[trimmedHistory.length - 1].role === 'user') {
+      trimmedHistory = trimmedHistory.slice(0, -1);
+    }
 
-    const systemPrompt = buildChatPrompt(persona, previousResponseSummary);
+    const systemPrompt = buildChatPrompt(persona, previousResponseSummary, isAyurveda);
     const messages = buildChatMessages(trimmedHistory, message);
 
     const reply = await callClaudeChat(systemPrompt, messages, 300);
@@ -51,34 +54,89 @@ router.post("/flow", async (req, res, next) => {
       return res.status(400).json({ success: false, error: "Message is required" });
     }
 
-    const systemPrompt = `You are an expert traditional Ayurvedic physician (Vaidya).
-Based on the user's query/concern, create a personalized step-by-step Ayurvedic healing protocol.
-Return ONLY a valid JSON object in this exact structure, with no markdown code blocks or other text:
+    const systemPrompt = `You are an expert Ayurvedic wellness assistant.
+Based on the user's health concern, generate a personalized healing protocol.
+
+RESPONSE RULES:
+1. FIRST CHECK: Determine if the query is related to health concerns, symptoms, Ayurveda, wellness, or herbs. If it is NOT (for example: general knowledge, history, programming, or queries like 'who is arjun'), you MUST return exactly this JSON:
+{
+  "success": false,
+  "error": "unrelated"
+}
+Do not generate a wellness protocol or do any analysis for unrelated queries.
+2. Identify the user's condition correctly.
+3. Use simple, everyday English. Avoid complex Ayurvedic terminology such as: Kapha, Pitta, Vata, Ama, Srotas, Agni, Dinacharya, Nasya, Pranayama. Explain health concerns in plain English.
+4. Focus on practical advice: what to do, what to avoid, when to seek medical help.
+5. Do not provide medicine dosages.
+6. Keep steps concise and clear.
+7. For serious conditions (cancer, heart disease, stroke, severe breathing problems), provide supportive wellness guidance only and clearly recommend consulting a doctor.
+
+CRITICAL: Respond ONLY with a single valid JSON object. No markdown, no code fences, no explanation text. Start your response with { and end with }.
+
+The JSON must follow this EXACT structure for related queries:
 {
   "success": true,
-  "title": "Ayurvedic Healing Protocol",
+  "title": "A specific title (e.g. 'Cooling Protocol for Acid Reflux')",
+  "doshaAnalysis": "1-2 sentences in plain English explaining the possible cause of the symptoms",
   "steps": [
     {
       "step": 1,
-      "title": "Phase 1: Cleansing & Preparation",
-      "desc": "What to do first (e.g. dietary adjustments, detoxification, or basic teas)."
+      "title": "Phase 1: Initial Care (Week 1)",
+      "desc": "Simple daily tips and foods to try. Focus on practical suggestions."
     },
     {
       "step": 2,
-      "title": "Phase 2: Core Remedy",
-      "desc": "The main herbs, preparations, or remedies to use and how to take them."
+      "title": "Phase 2: Core Remedies (Weeks 2-4)",
+      "desc": "Simple herbal teas or natural foods to eat and drink. No dosages."
     },
     {
       "step": 3,
-      "title": "Phase 3: Integration & Balance",
-      "desc": "Long-term changes, lifestyle practices, or pranayama to prevent recurrence."
+      "title": "Phase 3: Long-term Habits",
+      "desc": "Simple lifestyle practices and things to continue for long-term health."
     }
   ],
-  "doshaAnalysis": "Brief explanation of which doshas (Vata, Pitta, Kapha) are likely out of balance and how this protocol addresses them.",
-  "warning": "Key safety warnings and contraindications for this specific protocol."
+  "warning": "A short safety warning if needed."
 }`;
 
-    const flowData = await callClaudeJSON(systemPrompt, `User Query: ${message}`);
+    let flowData;
+    try {
+      flowData = await callClaudeJSON(systemPrompt, `Patient's concern: ${message.trim()}`, 1500);
+      if (flowData.success === false || flowData.error === "unrelated") {
+        // Safe to return, it's unrelated
+      } else {
+        // Ensure required fields exist
+        if (!flowData.title || !flowData.steps || !Array.isArray(flowData.steps) || flowData.steps.length === 0) {
+          throw new Error("Incomplete flow data returned");
+        }
+        flowData.success = true;
+      }
+    } catch (parseErr) {
+      console.error("[Flow parse error]", parseErr.message);
+      // Return a meaningful fallback instead of 500
+      flowData = {
+        success: true,
+        title: "General Wellness Protocol",
+        doshaAnalysis: "Based on your concern, we recommend starting with basic digestive wellness and a regular daily routine.",
+        steps: [
+          {
+            step: 1,
+            title: "Phase 1: Clear Liquids",
+            desc: "Begin with sipping warm water throughout the day. Avoid cold drinks and heavy foods for a few days to let your digestion rest."
+          },
+          {
+            step: 2,
+            title: "Phase 2: Light Meals",
+            desc: "Focus on warm, freshly cooked, easily digestible meals. Include mild spices like ginger and cumin in your cooking."
+          },
+          {
+            step: 3,
+            title: "Phase 3: Steady Rest",
+            desc: "Follow a regular sleep schedule. Take gentle walks after your meals and practice slow, deep breathing to manage daily stress."
+          }
+        ],
+        warning: "These guidelines are for general wellness only. Always consult a healthcare professional for persistent, severe, or worsening symptoms."
+      };
+    }
     res.json(flowData);
   } catch (err) {
     next(err);
