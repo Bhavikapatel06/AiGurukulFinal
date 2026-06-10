@@ -403,48 +403,35 @@
 @keyframes authSpin { to { transform: rotate(360deg); } }
 
 /* ── Responsive Styling ── */
-@media (max-width: 900px) {
+@media (max-width: 767px) {
   .auth-split-container {
     flex-direction: column;
-  }
-
-  .auth-left-pane,
-  .auth-right-pane {
-    width: 100%;
-    min-width: unset;
-    padding: 32px 20px;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-y: auto;
   }
 
   .auth-left-pane {
-    order: 1;
-  }
-
-  .auth-right-pane {
-    order: 2;
-    border-left: none;
-    border-top: 1px solid rgba(212, 175, 55, 0.1);
-    padding-top: 40px;
-    padding-bottom: 40px;
-  }
-
-  .auth-showcase-content {
-    max-width: 100%;
-    padding-top: 0;
-  }
-
-  .showcase-heading {
-    font-size: 28px;
-  }
-}
-
-@media (max-width: 600px) {
-  .auth-left-pane,
-  .auth-right-pane {
-    padding: 24px 16px;
+    width: 100%;
+    min-width: unset;
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 32px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .auth-left-content {
     max-width: 100%;
+    max-height: none;
+    gap: 16px;
+  }
+
+  .auth-right-pane {
+    display: none; /* Hide showcase splash on mobile devices to prevent overflow and excessive scrolling */
   }
 
   .auth-title {
@@ -453,18 +440,20 @@
 
   .auth-input-rel input {
     padding: 12px 14px 12px 42px;
+    font-size: 16px; /* Prevents auto-zoom on iOS input focus */
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-left-pane {
+    padding: 24px 16px;
   }
 
-  .feature-item-v4 {
-    gap: 14px;
+  .auth-left-content {
+    gap: 12px;
   }
 
-  .showcase-heading {
-    font-size: 24px;
-  }
-
-  .showcase-desc,
-  .feature-text-v4 p {
-    font-size: 14px;
+  .auth-title {
+    font-size: 19px;
   }
 }
