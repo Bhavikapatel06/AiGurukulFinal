@@ -452,6 +452,7 @@ function injectStyles() {
       outline: none;
       transition: all 0.25s;
       resize: none;
+      caret-color: #facc15;
     }
     .ayc-input:focus {
       border-color: rgba(212,175,55,0.5);

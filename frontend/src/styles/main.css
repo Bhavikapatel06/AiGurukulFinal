@@ -1,7 +1,3 @@
-/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-   AI Gurukul â€” Global Stylesheet
-   Dark gold theme. Import this in index.html.
-   â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Lato:wght@300;400;700&display=swap');
 
@@ -196,6 +192,7 @@ code {
   font-size: 15px;
   outline: none;
   transition: border-color var(--transition);
+  caret-color: #facc15;
 }
 
 .input:focus,
@@ -218,7 +215,7 @@ code {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 18px 28px;
+  padding: 16px 24px;
   border-bottom: 1px solid var(--gold-border);
   min-height: 64px;
   flex-shrink: 0;
@@ -620,296 +617,299 @@ code {
   width: 100%;
 }
 
-
 /* %% Premium Top Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 .landing-top-bar {
-    display: flex !important;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 40px;
-    background: rgba(13, 11, 8, 0.7);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--gold-border);
-    position: sticky;
-    top: 0;
-    width: 100%;
-    z-index: 1000;
-    height: 64px;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
+  background: rgba(13, 11, 8, 0.7);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--gold-border);
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  height: 64px;
 }
 
 .header-brand-mini {
-    font-family: 'Cinzel', serif;
-    font-size: 14px;
-    letter-spacing: 3px;
-    color: var(--gold);
-    font-weight: 700;
-    opacity: 0.8;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  font-weight: 700;
+  opacity: 0.8;
 }
 
 .header-profile-section {
-    display: flex;
-    align-items: center;
-    gap: 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
 
 .user-profile-badge {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: rgba(212, 175, 55, 0.05);
-    padding: 6px 16px;
-    border-radius: 30px;
-    border: 1px solid rgba(212, 175, 55, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(212, 175, 55, 0.05);
+  padding: 6px 16px;
+  border-radius: 30px;
+  border: 1px solid rgba(212, 175, 55, 0.15);
 }
 
 .user-icon-mini {
-    font-size: 14px;
-    background: var(--gold-dim);
-    width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    color: #000;
+  font-size: 14px;
+  background: var(--gold-dim);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #000;
 }
 
 .user-welcome {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 1px;
-    color: var(--text-muted);
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--text-muted);
 }
 
 .user-welcome strong {
-    color: var(--gold);
-    margin-left: 4px;
+  color: var(--gold);
+  margin-left: 4px;
 }
 
 .logout-btn-v3 {
-    opacity: 0.6;
-    font-size: 11px !important;
-    letter-spacing: 1px;
-    padding: 6px 12px !important;
+  opacity: 0.6;
+  font-size: 11px !important;
+  letter-spacing: 1px;
+  padding: 6px 12px !important;
 }
 
 .logout-btn-v3:hover {
-    opacity: 1;
-    background: rgba(226, 75, 74, 0.1) !important;
-    color: #ff6b6b !important;
-    border-color: #ff6b6b !important;
+  opacity: 1;
+  background: rgba(226, 75, 74, 0.1) !important;
+  color: #ff6b6b !important;
+  border-color: #ff6b6b !important;
 }
 
-/* %% Floating Seeker Status Card %%%%%%%%%%%%%%%%%%%%% */
+
+/* %% Floating Seeker Status Card %%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 .seeker-status-card {
-    position: fixed;
-    bottom: 40px;
-    right: 40px;
-    display: flex !important;
-    align-items: center;
-    gap: 20px;
-    background: rgba(26, 22, 18, 0.85);
-    backdrop-filter: blur(25px);
-    border: 1px solid var(--gold-border);
-    padding: 24px 30px;
-    border-radius: var(--r-xl);
-    box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 40px rgba(212, 175, 55, 0.05);
-    z-index: 1000;
-    max-width: 380px;
-    border-left: 4px solid var(--gold);
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  display: flex !important;
+  align-items: center;
+  gap: 20px;
+  background: rgba(26, 22, 18, 0.85);
+  backdrop-filter: blur(25px);
+  border: 1px solid var(--gold-border);
+  padding: 24px 30px;
+  border-radius: var(--r-xl);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 40px rgba(212, 175, 55, 0.05);
+  z-index: 1000;
+  max-width: 380px;
+  border-left: 4px solid var(--gold);
 }
 
 .seeker-avatar-v4 {
-    width: 68px;
-    height: 68px;
-    background: radial-gradient(circle at center, var(--gold-dim), #000);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--gold);
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-    flex-shrink: 0;
+  width: 68px;
+  height: 68px;
+  background: radial-gradient(circle at center, var(--gold-dim), #000);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+  flex-shrink: 0;
 }
 
 .seeker-icon-v4 {
-    font-size: 28px;
-    filter: drop-shadow(0 0 10px var(--gold));
+  font-size: 28px;
+  filter: drop-shadow(0 0 10px var(--gold));
 }
 
 .seeker-info-v4 {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .seeker-label {
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    letter-spacing: 3px;
-    color: var(--gold-dim);
-    font-weight: 700;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--gold-dim);
+  font-weight: 700;
 }
 
 .seeker-name-v4 {
-    font-family: 'Cinzel', serif;
-    font-size: 18px !important;
-    letter-spacing: 1px;
-    color: var(--gold);
-    margin: 0 !important;
+  font-family: 'Cinzel', serif;
+  font-size: 18px !important;
+  letter-spacing: 1px;
+  color: var(--gold);
+  margin: 0 !important;
 }
 
 .seeker-logout-btn {
-    background: none;
-    border: none;
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: #ff6b6b;
-    cursor: pointer;
-    padding: 5px 0;
-    text-align: left;
-    opacity: 0.7;
-    transition: all 0.3s;
-    width: fit-content;
+  background: none;
+  border: none;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #ff6b6b;
+  cursor: pointer;
+  padding: 5px 0;
+  text-align: left;
+  opacity: 0.7;
+  transition: all 0.3s;
+  width: fit-content;
 }
 
 .seeker-logout-btn:hover {
-    opacity: 1;
-    transform: translateX(5px);
+  opacity: 1;
+  transform: translateX(5px);
 }
 
-/* %% Minimalist Hero Greeting %%%%%%%%%%%%%%%%%%%%%%%% */
+
+/* %% Minimalist Hero Greeting %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 .hero-welcome-v5 {
-    margin-top: 60px;
-    margin-bottom: 20px;
-    text-align: center;
-    position: relative;
-    z-index: 10;
+  margin-top: 60px;
+  margin-bottom: 20px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
 }
 
 .welcome-badge-v5 {
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    letter-spacing: 5px;
-    color: var(--gold-dim);
-    text-transform: uppercase;
-    font-weight: 700;
-    display: block;
-    margin-bottom: 12px;
-    opacity: 0.7;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 5px;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 12px;
+  opacity: 0.7;
 }
 
 .welcome-row-v5 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
 }
 
 .welcome-text-v5 {
-    font-family: 'Cinzel', serif;
-    font-size: 24px !important;
-    color: var(--gold);
-    letter-spacing: 1px;
-    margin: 0 !important;
-    text-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
+  font-family: 'Cinzel', serif;
+  font-size: 24px !important;
+  color: var(--gold);
+  letter-spacing: 1px;
+  margin: 0 !important;
+  text-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
 }
 
 .hero-exit-btn-v5 {
-    background: none;
-    border: 1px solid rgba(255,107,107,0.2);
-    color: #ff6b6b;
-    font-size: 11px;
-    font-family: 'Cinzel', serif;
-    padding: 4px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: all 0.3s;
-    opacity: 0.6;
+  background: none;
+  border: 1px solid rgba(255,107,107,0.2);
+  color: #ff6b6b;
+  font-size: 11px;
+  font-family: 'Cinzel', serif;
+  padding: 4px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+  opacity: 0.6;
 }
 
 .hero-exit-btn-v5:hover {
-    opacity: 1;
-    background: rgba(255,107,107,0.1);
-    border-color: #ff6b6b;
+  opacity: 1;
+  background: rgba(255,107,107,0.1);
+  border-color: #ff6b6b;
 }
 
-/* %% Bottom Corner Anchors %%%%%%%%%%%%%%%%%%%%%%%%%%% */
+
+/* %% Bottom Corner Anchors %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 .bottom-seeker-anchor {
-    position: fixed;
-    bottom: 40px;
-    left: 40px;
-    z-index: 2000;
-    text-align: left;
+  position: fixed;
+  bottom: 40px;
+  left: 40px;
+  z-index: 2000;
+  text-align: left;
 }
 
 .bottom-exit-anchor {
-    position: fixed;
-    bottom: 40px;
-    right: 40px;
-    z-index: 2000;
-    text-align: right;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 0;
+  position: fixed;
+  bottom: 40px;
+  right: 40px;
+  z-index: 2000;
+  text-align: right;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 
 .anchor-label {
-    display: block;
-    font-family: 'Cinzel', serif;
-    font-size: 8px;
-    letter-spacing: 5px;
-    color: var(--gold-dim);
-    margin-bottom: 6px;
-    font-weight: 700;
-    opacity: 0.6;
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 5px;
+  color: var(--gold-dim);
+  margin-bottom: 6px;
+  font-weight: 700;
+  opacity: 0.6;
 }
 
 .anchor-text {
-    font-family: 'Cinzel', serif;
-    font-size: 14px;
-    letter-spacing: 1px;
-    color: var(--gold);
-    margin: 0;
-    text-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
-    transition: all 0.3s;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--gold);
+  margin: 0;
+  text-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+  transition: all 0.3s;
 }
 
 .bottom-exit-anchor:hover .anchor-text {
-    color: #ff6b6b;
-    transform: translateX(8px);
-    text-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
+  color: #ff6b6b;
+  transform: translateX(8px);
+  text-shadow: 0 0 20px rgba(255, 107, 107, 0.3);
 }
 
 .bottom-seeker-anchor strong {
-    margin-left: 2px;
+  margin-left: 2px;
 }
 
-/* %% Minimalist Corner Logout %%%%%%%%%%%%%%%%%%%%%%%% */
+
+/* %% Minimalist Corner Logout %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 .minimal-logout-v6 {
-    position: fixed;
-    bottom: 24px;
-    right: 32px;
-    background: none;
-    border: none;
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 2px;
-    color: var(--gold-dim);
-    cursor: pointer;
-    z-index: 2000;
-    opacity: 0.5;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    text-transform: uppercase;
+  position: fixed;
+  bottom: 24px;
+  right: 32px;
+  background: none;
+  border: none;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--gold-dim);
+  cursor: pointer;
+  z-index: 2000;
+  opacity: 0.5;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-transform: uppercase;
 }
 
 .minimal-logout-v6:hover {
-    opacity: 1;
-    color: #ff6b6b;
-    transform: translateX(5px);
-    text-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
+  opacity: 1;
+  color: #ff6b6b;
+  transform: translateX(5px);
+  text-shadow: 0 0 15px rgba(255, 107, 107, 0.4);
 }
 
 @media(max-width: 768px) {
