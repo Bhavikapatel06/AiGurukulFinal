@@ -365,13 +365,13 @@ function showTutorialModal(container) {
   if (!portal) return;
   portal.innerHTML = `
     <div class="hint-modal-overlay" id="tutorial-overlay">
-      <div class="hint-modal-content tutorial-modal" style="max-width: 450px; padding: 40px 25px;">
+      <div class="hint-modal-content tutorial-modal">
         <button class="hint-modal-close" id="tutorial-close-btn">&times;</button>
         
         <div class="tutorial-header">
-          <div class="hint-icon" style="font-size: 50px; animation: floatIcon 3s ease-in-out infinite;">📜</div>
-          <h2 style="font-size: 26px; margin-bottom: 5px; color: var(--gold);">How to Play</h2>
-          <p style="color: #aaa; font-size: 12px; margin-bottom: 25px; letter-spacing: 2px; text-transform: uppercase;">Your Journey Begins Here</p>
+          <div class="hint-icon" style="font-size: 35px; animation: floatIcon 3s ease-in-out infinite;">📜</div>
+          <h2 style="font-size: 20px; margin-bottom: 2px; color: var(--gold);">How to Play</h2>
+          <p style="color: #aaa; font-size: 10px; margin-bottom: 15px; letter-spacing: 2px; text-transform: uppercase;">Your Journey Begins Here</p>
         </div>
 
         <div class="tutorial-steps">
@@ -422,14 +422,13 @@ function showHintModal(hint, container) {
   const portal = container.querySelector('#game-modal-portal');
   portal.innerHTML = `
     <div class="hint-modal-overlay">
-      <div class="hint-modal-content">
+      <div class="hint-modal-content premium-hint-modal">
         <button class="hint-modal-close" id="hint-modal-close-btn">&times;</button>
-        <div class="hint-icon">💡</div>
-        <h2>Divine Insight</h2>
-        <div class="hint-text-box">
+        <div class="premium-hint-icon">💡</div>
+        <h2 class="premium-hint-title">Divine Insight</h2>
+        <div class="premium-hint-box">
           <p>"${hint}"</p>
         </div>
-        <p class="hint-subtext">Look at the clues to Guess the Name!</p>
       </div>
     </div>
   `;

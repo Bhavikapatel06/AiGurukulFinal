@@ -253,16 +253,17 @@
   justify-content: center;
   z-index: 2000;
   animation: fadeIn 0.3s;
+  padding: 20px;
 }
 
 .hint-modal-content {
   position: relative;
   background: linear-gradient(180deg, var(--surface2) 0%, var(--bg) 100%);
   border: 1px solid var(--gold-border-hi);
-  padding: 40px 30px 30px;
+  padding: 25px 20px 20px;
   border-radius: 24px;
   max-width: 90%;
-  width: 400px;
+  width: 360px;
   text-align: center;
   box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(212, 175, 55, 0.2);
   animation: scaleUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -284,6 +285,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 100;
 }
 
 .hint-modal-close:hover {
@@ -291,8 +293,8 @@
 }
 
 .hint-icon {
-  font-size: 50px;
-  margin-bottom: 15px;
+  font-size: 35px;
+  margin-bottom: 5px;
   filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
 }
 
@@ -328,6 +330,53 @@
   letter-spacing: 1px;
 }
 
+/* 🌟 Premium Hint Modal Enhancements */
+.premium-hint-modal {
+  background: rgba(15, 15, 15, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 20px rgba(212, 175, 55, 0.1);
+  border-radius: 20px;
+  padding: 30px 25px;
+}
+
+.premium-hint-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.5));
+  animation: floatIcon 3s ease-in-out infinite;
+}
+
+.premium-hint-title {
+  font-family: 'Cinzel', serif;
+  color: var(--gold);
+  font-size: 20px;
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.premium-hint-box {
+  background: linear-gradient(145deg, rgba(212, 175, 55, 0.1) 0%, rgba(0,0,0,0.2) 100%);
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 3px solid var(--gold);
+  border-right: 1px solid rgba(212,175,55,0.1);
+  border-top: 1px solid rgba(212,175,55,0.1);
+  border-bottom: 1px solid rgba(212,175,55,0.1);
+}
+
+.premium-hint-box p {
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.5;
+  font-style: italic;
+  margin: 0;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
 /* Tutorial Specific Enhancements */
 .tutorial-modal {
   background: radial-gradient(circle at top, rgba(30,25,15,0.95) 0%, rgba(10,10,10,0.98) 100%);
@@ -337,18 +386,18 @@
 .tutorial-steps {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 30px;
+  gap: 8px;
+  margin-bottom: 15px;
   text-align: left;
 }
 
 .tutorial-step {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 10px;
   background: rgba(255,255,255,0.03);
-  padding: 12px 15px;
-  border-radius: 16px;
+  padding: 8px 12px;
+  border-radius: 12px;
   border: 1px solid rgba(212, 175, 55, 0.1);
   transition: transform 0.3s, border-color 0.3s;
 }
@@ -360,10 +409,10 @@
 }
 
 .step-icon {
-  font-size: 28px;
+  font-size: 20px;
   background: rgba(0,0,0,0.5);
-  width: 45px;
-  height: 45px;
+  width: 35px;
+  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -375,24 +424,24 @@
 
 .step-text h4 {
   color: var(--gold);
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   font-family: 'Cinzel', serif;
-  font-size: 15px;
+  font-size: 13px;
 }
 
 .step-text p {
   color: #ccc;
-  font-size: 12px !important;
-  line-height: 1.4 !important;
+  font-size: 10px !important;
+  line-height: 1.3 !important;
   font-style: normal !important;
   margin: 0;
 }
 
 .tutorial-start-btn {
   width: 100%;
-  padding: 14px !important;
-  font-size: 16px !important;
-  border-radius: 16px !important;
+  padding: 10px !important;
+  font-size: 14px !important;
+  border-radius: 12px !important;
   background: linear-gradient(90deg, var(--gold-dim) 0%, var(--gold) 50%, var(--gold-dim) 100%);
   background-size: 200% auto;
   color: #000 !important;
